@@ -1,5 +1,4 @@
 2.1 Prim 算法
-
 /*  * Prim求MST  * 耗费矩阵cost[][]，标号从0开始，0~n-1  * 返回最小生成树的权值，返回-1表示原图不连通  */
 const int INF=0x3f3f3f3f;
 const int MAXN=110;
@@ -89,4 +88,3 @@ int Kruskal(int n)//传入点数，返回最小生成树的权值，如果不连通返回-1
     else
         return ans;
 }
-

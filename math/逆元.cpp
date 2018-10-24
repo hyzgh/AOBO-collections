@@ -5,4 +5,3 @@ void getinv()
   for(int i=2;i<=n;i++)
     inv[i]=1ll*(p-p/i)*inv[p%i]%p;
 }
-

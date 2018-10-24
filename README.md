@@ -4069,6 +4069,33 @@ struct ZKW_MinCostMaxFlow{
 /************************************************************/
 ```
 
+## 几何
+### 旋转卡壳
+```
+#include<bits/stdc++.h>
+#define x first
+#define y second
+#define ok cout << "ok" << endl;
+using namespace std;
+typedef long long ll;
+typedef unsigned long long ull;
+typedef vector<int> vi;
+typedef pair<int, int> pii;
+typedef pair<ll, ll> pll;
+const long double PI = acos(-1.0);
+const int INF = 0x3f3f3f3f;
+const double Eps = 1e-7;
+const int N = 1e5+9;
+
+int main(void) {
+	if(fopen("in", "r")!=NULL) {freopen("in", "r", stdin); freopen("out", "w", stdout);}
+
+	return 0;
+}
+
+```
+
+
 ## 应对卡常
 1. 使用快速读入、快速输出
 2. 使用`vector.reserve(size);`，一次性申请好所需要的容器空间，避免多次拓容消耗更多的时间。

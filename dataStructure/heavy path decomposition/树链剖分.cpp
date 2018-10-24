@@ -1,3 +1,6 @@
+/************************************************************/
+/* 树链剖分
+ */
 #include <bits/stdc++.h>
 #define pb push_back
 #define lc (i << 1)
@@ -157,7 +160,6 @@ ull get_ans(int u, int v)
 
 int main()
 {
-//    freopen("1.txt", "r", stdin);
     while(~scanf("%d", &n))
     {
         for(int i = 1; i <= n; i ++)
@@ -195,4 +197,4 @@ int main()
     }
     return 0;
 }
-
+/************************************************************/

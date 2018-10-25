@@ -1,7 +1,50 @@
 # AOBO-collections
 
-# AOBO 模板
-[toc]
+[TOC]
+## vim 配置
+```
+syntax on
+set nu
+set tabstop=4
+set shiftwidth=4
+colo evening
+set mouse=a
+set cin
+
+map <F2> :call Import() <CR>
+map <F3> :only<CR>:60vsp in<CR>:sp out<CR><C-W><RIGHT>
+nnoremap <F9>   <Esc>:w<CR> :! ctags %<CR> :!g++ -std=c++11 % -o /tmp/a.out && /tmp/a.out<CR>
+map <F10> <Esc>:w<CR>gg"+1000Y
+
+func Import()
+	exec "r ~/code/z"
+endfunc
+```
+
+## 起手式
+```
+#include<bits/stdc++.h>
+#define x first
+#define y second
+#define ok cout << "ok" << endl;
+using namespace std;
+typedef long long ll;
+typedef unsigned long long ull;
+typedef vector<int> vi;
+typedef pair<int, int> pii;
+typedef pair<ll, ll> pll;
+const long double PI = acos(-1.0);
+const int INF = 0x3f3f3f3f;
+const double Eps = 1e-7;
+const int N = 1e5+9;
+
+int main(void) {
+	if(fopen("in", "r")!=NULL) {freopen("in", "r", stdin); freopen("out", "w", stdout);}
+
+	return 0;
+}
+```
+
 ## Alpha-Beta 剪枝
 ```
 /************************************************************/
@@ -204,6 +247,130 @@ struct AC {
 	}
 }ac;
 /********************************************************************************/
+```
+### 回文自动机
+```
+/************************************************************/
+/* 回文自动机：解决一类回文字符串问题(Tested 6 times)
+ * 时间复杂度：O(|S| * log(字符集个数))
+ */
+const int MAXN = 1e5 + 9;
+const int NN = 26;	//字符集个数
+
+struct Palindromic_Tree {
+	int next[MAXN][NN];//next指针，next指针和字典树类似，指向的串为当前串两端加上同一个字符构成
+	int fail[MAXN];//fail指针，失配后跳转到fail指针指向的节点
+	int cnt[MAXN]; //cnt[i]表示i表示的回文字符串在整个字符串中出现了多少次
+	int num[MAXN]; //num[i]表示i表示的回文字符串中有多少个本质不同的字符串（包括本身）
+	int len[MAXN];//len[i]表示节点i表示的回文串的长度
+	int S[MAXN];//存放添加的字符
+	int last;//指向上一个字符所在的节点，方便下一次add
+	int n;//字符数组指针
+	int p;//节点指针
+
+	int newnode(int l) {//新建节点
+		for(int i = 0; i < NN; i++) next[p][i] = 0;
+		cnt[p] = 0;
+		num[p] = 0;
+		len[p] = l;
+		return p++;
+	}
+
+	void init() {//初始化
+		p = 0;
+		newnode(0);
+		newnode(-1);
+		last = 0;
+		n = 0;
+		S[n] = -1;//开头放一个字符集中没有的字符，减少特判
+		fail[0] = 1;
+	}
+
+	int get_fail(int x) {//和KMP一样，失配后找一个尽量最长的
+		while(S[n - len[x] - 1] != S[n]) x = fail[x];
+		return x ;
+	}
+
+	// 插入的是字符
+	void add(int c) {
+		c -= 'a';
+		S[++ n] = c;
+		int cur = get_fail(last);//通过上一个回文串找这个回文串的匹配位置
+		if(!next[cur][c]) {//如果这个回文串没有出现过，说明出现了一个新的本质不同的回文串
+			int now = newnode(len[cur] + 2);//新建节点
+			fail[now] = next[get_fail(fail[cur])][c];//和AC自动机一样建立fail指针，以便失配后跳转
+			next[cur][c] = now;
+			num[now] = num[fail[now]] + 1;
+		}
+		last = next[cur][c];
+		cnt[last]++;
+	}
+
+	void count () {
+		for(int i = p - 1; i >= 0; i--) cnt[fail[i]] += cnt[i];
+		//父亲累加儿子的cnt，因为如果fail[v]=u，则u一定是v的子回文串！
+	}
+}pt;
+/************************************************************/
+```
+
+### SAM
+```
+/************************************************************/
+/* 后缀自动机(Tested 8 times)
+ * 数组实现，效率较高
+ * 开点时才初始化，在多组样例的情况下会比直接memset整个数组快很多，比如HDU4416
+ * 时间复杂度：O(n * CHARSET_SIZE)
+ * used variables: N, 
+ */
+const int CHARSET_SIZE = 26;
+const int MAXN = N << 1;  // 注意在SAM里面开的数组大小应为MAXN，因为长度为n的字符串最多会有2*n个结点
+
+struct SuffixAutomaton {
+	int ch[MAXN][CHARSET_SIZE], len[MAXN], fail[MAXN], sz, last, cntPos[MAXN];
+	int tong[MAXN], topo[MAXN];
+	void init() {
+		len[0] = 0;
+		sz = 1;
+		last = newnode(0);
+	}
+	int newnode(int le) {
+		len[sz] = le;
+		fail[sz] = 0;
+		for(int i = 0; i < CHARSET_SIZE; i++)
+			ch[sz][i] = 0;
+		return sz++;
+	}
+	void insert(int c) {
+		c -= 'a';
+		int v = last, u = newnode(len[v] + 1);
+		last = u;
+		cntPos[u] = 1;
+		for(; v && !ch[v][c]; v = fail[v]) ch[v][c] = u;
+		if(!v){fail[u] = 1; return;}
+		int o = ch[v][c];
+		if(len[v] + 1 == len[o]) fail[u] = o;
+		else {
+			int n = newnode(len[v] + 1);
+			cntPos[n] = 0;
+			memcpy(ch[n], ch[o], sizeof(ch[0]));
+			fail[n] = fail[o];
+			fail[u] = fail[o] = n;
+			for(; ch[v][c] == o; v = fail[v]) ch[v][c] = n;
+		}
+	}
+	void topoSort() {
+		memset(tong, 0, sizeof tong);
+		tong[0] = 1;
+		for(int i = 1; i < sz; i++)
+			tong[len[i]]++;
+		for(int i = 1; i < sz; i++)
+			tong[i] += tong[i - 1];
+		for(int i = sz - 1; i >= 1; i--)
+			topo[--tong[len[i]]] = i;
+	}
+}sam;
+/************************************************************/
 ```
 
 ### 树链剖分
@@ -410,129 +577,286 @@ int main()
 /************************************************************/
 ```
 
-### 回文自动机
+### splay
 ```
-/************************************************************/
-/* 回文自动机：解决一类回文字符串问题(Tested 6 times)
- * 时间复杂度：O(|S| * log(字符集个数))
- */
-const int MAXN = 1e5 + 9;
-const int NN = 26;	//字符集个数
+#include <iostream>
+#include <cstdio>
+#include <cstring>
+#include <stack>
+#include <vector>
+#include <algorithm>
+#include <queue>
+#pragma comment(linker, "/STACK:1024000000,1024000000")
+using namespace std;
+typedef long long ll;
+const int N=200005, inf=0x3f3f3f3f;
 
-struct Palindromic_Tree {
-	int next[MAXN][NN];//next指针，next指针和字典树类似，指向的串为当前串两端加上同一个字符构成
-	int fail[MAXN];//fail指针，失配后跳转到fail指针指向的节点
-	int cnt[MAXN]; //cnt[i]表示i表示的回文字符串在整个字符串中出现了多少次
-	int num[MAXN]; //num[i]表示i表示的回文字符串中有多少个本质不同的字符串（包括本身）
-	int len[MAXN];//len[i]表示节点i表示的回文串的长度
-	int S[MAXN];//存放添加的字符
-	int last;//指向上一个字符所在的节点，方便下一次add
-	int n;//字符数组指针
-	int p;//节点指针
+typedef struct splaynode* node;
+struct splaynode {
+    node pre, ch[2];
+    ll value, lazy, max, sum;
+    int size, rev;
+    void init(int _value) {
+        pre=ch[0]=ch[1]=NULL;
+        max=value=sum=_value;
+        lazy=rev=0;
+        size=1;
+    }
+}mem[N];
+int memtop;
 
-	int newnode(int l) {//新建节点
-		for(int i = 0; i < NN; i++) next[p][i] = 0;
-		cnt[p] = 0;
-		num[p] = 0;
-		len[p] = l;
-		return p++;
-	}
+stack<node> S;
+node root;
 
-	void init() {//初始化
-		p = 0;
-		newnode(0);
-		newnode(-1);
-		last = 0;
-		n = 0;
-		S[n] = -1;//开头放一个字符集中没有的字符，减少特判
-		fail[0] = 1;
-	}
+inline int getsize(node &x) {
+    return x ? x->size : 0;
+}
 
-	int get_fail(int x) {//和KMP一样，失配后找一个尽量最长的
-		while(S[n - len[x] - 1] != S[n]) x = fail[x];
-		return x ;
-	}
+void pushdown(node &x) {
+    if (!x) return;
+    if (x->lazy) {
+        ll w = x->lazy;
+        x->value += w;
+        if (x->ch[0]) {
+            x->ch[0]->lazy += w;
+            x->ch[0]->max += w;
+            x->ch[0]->sum += w*getsize(x->ch[0]);
+        }
+        if (x->ch[1]) {
+            x->ch[1]->lazy += w;
+            x->ch[1]->max += w;
+            x->ch[1]->sum += w*getsize(x->ch[1]);
+        }
+        x->lazy = 0;
+    }
+    if (x->rev) {
+        node t = x->ch[0];
+        x->ch[0] = x->ch[1];
+        x->ch[1] = t;
+        x->rev = 0;
+        if (x->ch[0]) x->ch[0]->rev ^= 1;
+        if (x->ch[1]) x->ch[1]->rev ^= 1;
+    }
+}
 
-	// 插入的是字符
-	void add(int c) {
-		c -= 'a';
-		S[++ n] = c;
-		int cur = get_fail(last);//通过上一个回文串找这个回文串的匹配位置
-		if(!next[cur][c]) {//如果这个回文串没有出现过，说明出现了一个新的本质不同的回文串
-			int now = newnode(len[cur] + 2);//新建节点
-			fail[now] = next[get_fail(fail[cur])][c];//和AC自动机一样建立fail指针，以便失配后跳转
-			next[cur][c] = now;
-			num[now] = num[fail[now]] + 1;
-		}
-		last = next[cur][c];
-		cnt[last]++;
-	}
+void update(node &x) {
+    if (!x) return;
+    x->size = 1;
+    x->max = x->value;
+    x->sum = x->value;
+    if (x->ch[0]) {
+        x->sum += x->ch[0]->sum;
+        x->max = max(x->max, x->ch[0]->max);
+        x->size += x->ch[0]->size;
+    }
+    if (x->ch[1]) {
+        x->sum += x->ch[1]->sum;
+        x->max = max(x->max, x->ch[1]->max);
+        x->size += x->ch[1]->size;
+    }
+}
 
-	void count () {
-		for(int i = p - 1; i >= 0; i--) cnt[fail[i]] += cnt[i];
-		//父亲累加儿子的cnt，因为如果fail[v]=u，则u一定是v的子回文串！
-	}
-}pt;
-/************************************************************/
-```
+void rotate(node &x, int d) {
+    node y = x->pre;
+    pushdown(y);
+    pushdown(x);
+    pushdown(x->ch[d]);
+    y->ch[!d] = x->ch[d];
+    if (x->ch[d] != NULL) x->ch[d]->pre = y;
+    x->pre = y->pre;
+    if (y->pre != NULL)
+        if (y->pre->ch[0] == y) y->pre->ch[0] = x; else y->pre->ch[1] = x;
+    x->ch[d] = y;
+    y->pre = x;
+    update(y);
+    if (y == root) root = x;
+}
 
-### SAM
-```
-/************************************************************/
-/* 后缀自动机(Tested 8 times)
- * 数组实现，效率较高
- * 开点时才初始化，在多组样例的情况下会比直接memset整个数组快很多，比如HDU4416
- * 时间复杂度：O(n * CHARSET_SIZE)
- * used variables: N, 
- */
-const int CHARSET_SIZE = 26;
-const int MAXN = N << 1;  // 注意在SAM里面开的数组大小应为MAXN，因为长度为n的字符串最多会有2*n个结点
+void splay(node &src, node &dst) {
+    pushdown(src);
+    while (src!=dst) {
+        if (src->pre==dst) {
+            if (dst->ch[0]==src) rotate(src, 1); else rotate(src, 0);
+            break;
+        }
+        else {
+            node y=src->pre, z=y->pre;
+            if (z->ch[0]==y) {
+                if (y->ch[0]==src) {
+                    rotate(y, 1);
+                    rotate(src, 1);
+                }else {
+                    rotate(src, 0);
+                    rotate(src, 1);
+                }
+            }
+            else {
+                if (y->ch[1]==src) {
+                    rotate(y, 0);
+                    rotate(src, 0);
+                }else {
+                    rotate(src, 1);
+                    rotate(src, 0);
+                }
+            }
+            if (z==dst) break;
+        }
+        update(src);
+    }
+    update(src);
+}
 
-struct SuffixAutomaton {
-	int ch[MAXN][CHARSET_SIZE], len[MAXN], fail[MAXN], sz, last, cntPos[MAXN];
-	int tong[MAXN], topo[MAXN];
-	void init() {
-		len[0] = 0;
-		sz = 1;
-		last = newnode(0);
-	}
-	int newnode(int le) {
-		len[sz] = le;
-		fail[sz] = 0;
-		for(int i = 0; i < CHARSET_SIZE; i++)
-			ch[sz][i] = 0;
-		return sz++;
-	}
-	void insert(int c) {
-		c -= 'a';
-		int v = last, u = newnode(len[v] + 1);
-		last = u;
-		cntPos[u] = 1;
-		for(; v && !ch[v][c]; v = fail[v]) ch[v][c] = u;
-		if(!v){fail[u] = 1; return;}
-		int o = ch[v][c];
-		if(len[v] + 1 == len[o]) fail[u] = o;
-		else {
-			int n = newnode(len[v] + 1);
-			cntPos[n] = 0;
-			memcpy(ch[n], ch[o], sizeof(ch[0]));
-			fail[n] = fail[o];
-			fail[u] = fail[o] = n;
-			for(; ch[v][c] == o; v = fail[v]) ch[v][c] = n;
-		}
-	}
-	void topoSort() {
-		memset(tong, 0, sizeof tong);
-		tong[0] = 1;
-		for(int i = 1; i < sz; i++)
-			tong[len[i]]++;
-		for(int i = 1; i < sz; i++)
-			tong[i] += tong[i - 1];
-		for(int i = sz - 1; i >= 1; i--)
-			topo[--tong[len[i]]] = i;
-	}
-}sam;
-/************************************************************/
+void select(int k, node &f) {  //
+    int tmp;
+    node t = root;
+    while (1) {
+        pushdown(t);
+        tmp = getsize(t->ch[0]);
+        if (k == tmp + 1) break;
+        if (k <= tmp) t = t->ch[0];
+        else {
+            k -= tmp + 1;
+            t = t->ch[1];
+        }
+    }
+    pushdown(t);
+    splay(t, f);
+}
+
+inline void selectsegment(int l,int r) { // 提取区间[l, r]
+    select(l, root);
+    select(r + 2, root->ch[1]);
+}
+
+void insert(int pos, int value) {  //在pos位置后面插入一个新值value
+    selectsegment(pos + 1, pos);
+    node t;
+    node x = root->ch[1];
+    pushdown(root);
+    pushdown(x);
+    if (!S.empty()) {
+        t = S.top();
+        S.pop();
+    } else {
+        t = &mem[memtop++];
+    }
+    t->init(value);
+    t->ch[1] = x;
+    x->pre = t;
+    root->ch[1] = t;
+    t->pre = root;
+    splay(x, root);
+}
+
+void add(int a,int b, int value) {  //区间[a,b]中的数都加上value
+    selectsegment(a, b);
+    node x = root->ch[1]->ch[0];
+    pushdown(x);
+    update(x);
+    x->max += value;
+    x->lazy += value;
+    splay(x, root);
+}
+
+void reverse(int a, int b) {   //区间[a,b]中的数翻转
+    selectsegment(a, b);
+    root->ch[1]->ch[0]->rev ^= 1;
+    node x = root->ch[1]->ch[0];
+    splay(x, root);
+}
+
+void revolve(int a, int b, int t) { //区间[a,b]中的数向后循环移t位
+    node p1, p2;
+    selectsegment(a, b);
+    select(b + 1 - t, root->ch[1]->ch[0]);
+    p1 = root->ch[1]->ch[0];
+    pushdown(p1);
+    p2 = p1->ch[1];
+    p1->ch[1] = NULL;
+
+    select(a + 1, root->ch[1]->ch[0]);
+    p1 = root->ch[1]->ch[0];
+    pushdown(p1);
+    p1->ch[0] = p2;
+    p2->pre = p1;
+
+    splay(p2, root);
+}
+
+ll getmax(int a, int b) {   //取[a,b]中最小的值
+    selectsegment(a, b);
+    node x = root->ch[1];
+    pushdown(x);
+    x = x->ch[0];
+    pushdown(x);
+    update(x);
+    return x->max;
+}
+
+ll getsum(int a, int b) { //
+    selectsegment(a, b);
+    node x = root->ch[1];
+    pushdown(x);
+    x = x->ch[0];
+    pushdown(x);
+    update(x);
+    return x->sum;
+}
+
+void erase(int pos) {               //抹去第pos个元素
+    selectsegment(pos, pos);
+    pushdown(root->ch[1]);
+    S.push(root->ch[1]->ch[0]);        //回收内存
+    root->ch[1]->ch[0] = NULL;
+    node x = root->ch[1];
+    splay(x, root);
+}
+
+
+void cutandmove(int a,int b,int c)   // [a, b]移动到c后面
+{
+    selectsegment(a,b);
+    node CutRoot=root->ch[1]->ch[0];
+    CutRoot->pre=NULL;
+    root->ch[1]->size-=CutRoot->size;
+    root->ch[1]->ch[0]=NULL;
+
+    selectsegment(c+1,c);
+
+    CutRoot->pre=root->ch[1];
+    root->ch[1]->ch[0]=CutRoot;
+    root->ch[1]->size+=CutRoot->size;
+}
+
+void cut(int a,int b)  // 删除区间[l, r]
+{
+    selectsegment(a,b);
+    node CutRoot=root->ch[1]->ch[0];
+    CutRoot->pre=NULL;
+    root->size-=CutRoot->size;
+    root->ch[1]->size-=CutRoot->size;
+    root->ch[1]->ch[0]=NULL;
+}
+
+vector<int> ans;
+void inorder(node x) // 中序遍历结果
+{
+    if (!x) return;
+    pushdown(x);
+    inorder(x->ch[0]);
+    if (x->value!=inf) ans.push_back(x->value);
+    inorder(x->ch[1]);
+}
+
+void initsplaytree(ll *a, int n) { // 初始化
+    memtop = 0;
+    root = &mem[memtop++];
+    root->init(inf);
+    root->ch[1] = &mem[memtop++];
+    root->ch[1]->init(inf);
+    while (!S.empty()) S.pop();
+    for (int i = 0; i < n; i++) insert(i, a[i]);
+}
 ```
 
 ### 带权并查集
@@ -570,6 +894,7 @@ struct pre
 };
 /************************************************************/
 ```
+
 ### 线段树
 #### 扫描线
 ```
@@ -3205,7 +3530,8 @@ int main(void) {
 ```
 
 ## pb_ds
-###1.hash（可取代map）
+
+### hash（可取代map）
 
 cc_hash_table 是拉链法
 gp_hash_table 是查探法 
@@ -3217,7 +3543,7 @@ __gnu_pbds::cc_hash_table<int,bool> h1;
 __gnu_pbds::gp_hash_table<int,bool> h2; // 比CC稍快
 ```
 
-###2.priority——queue优先队列
+###priority——queue优先队列
 1. push()  //会返回一个迭代器
 2. top()  //同 stl 
 3. size()  //同 stl 
@@ -3239,7 +3565,7 @@ __gnu_pbds::priority_queue<int,greater<int>,thin_heap_tag> pq;//快
 __gnu_pbds::priority_queue<int,greater<int> > pq;//快
 ```
 
-###3.rb_tree_tag红黑树
+###rb_tree_tag红黑树
 1. 插入 ：insert(); 
 2. 删除 ：erase();
 3. 大小 ：size();
@@ -3258,7 +3584,7 @@ tree<int, null_type, less<int>, rb_tree_tag, tree_order_statistics_node_update> 
 
 ```
 
-###4.rope平衡树
+###rope平衡树
 
 1. 运算符：rope支持operator += -= + - < ==
 2. 输入输出：可以用<<运算符由输入输出流读入或输出。
@@ -3271,7 +3597,7 @@ copy(pos,len,x); //从pos开始到pos+len为止用x代替
 replace(pos,x); //从pos开始换成x[pos,pos+x)
 substr(pos,x); //提取pos开始x个
 at(x)/[x]; //访问第x个元素 t[i], t.at(i)
-        
+  ​      
 ```C++
 #include <ext/rope>
 using namespace __gnu_cxx;//第一条下划线其实是两条
@@ -4069,28 +4395,168 @@ struct ZKW_MinCostMaxFlow{
 /************************************************************/
 ```
 
-## 几何
+## 计算几何
+### 叉积
+#### 定义
+若$ \vec{OA}=(x_1,y_1)~~\vec{OB}=(x_2,y_2) $
+定义叉积：$ \vec{OA}\times \vec{OB}=x_1y_2-x_2y_1 $
+#### 性质
+1. $ S_{\triangle OAB}={1\over 2}|\vec{OA}\times \vec{OB}| $
+2. 已知直线上的两点s、e，可以求出ax+by+c=0的参数 
+a = s.y-e.y; 
+b = e.x-s.x; 
+c = s×e;
+#### 应用
+##### 判断点与直线的相对位置
+在直线上取两点P，Q，需要判断的点A与直线的相对位置。令 $ t = \vec{AP}\times \vec{AQ} $ ，分三种情况讨论：
+1. 当$ t = 0 $时，A在直线PQ上。
+2. 当$ t < 0 $时，A在直线左侧。
+3. 当$ t > 0 $时，A在直线右侧。
+
+### 凸多边形的面积公式及重心公式
+1. 面积公式：
+$ A = \frac{1}{2}\sum_{i=0}^{N-1}(x_i\ y_{i+1} - x_{i+1}\ y_i) $
+2. 重心公式：
+$ C_x = \frac{1}{6A}\sum_{i=0}^{N-1}(x_i+x_{i+1})(x_i\ y_{i+1} - x_{i+1}\ y_i) $
+$ C_y = \frac{1}{6A}\sum_{i=0}^{N-1}(y_i+y_{i+1})(x_i\ y_{i+1} - x_{i+1}\ y_i) $
+
+### 精度控制
+1. sqrtl() 函数的输入参数为long double，范围值也是long double。cos，atan等同理，只l要在函数后加个l。
+
 ### 旋转卡壳
 ```
-#include<bits/stdc++.h>
-#define x first
-#define y second
-#define ok cout << "ok" << endl;
+#include <iostream>
+#include <bits/stdc++.h>
+#define INF 0x3f3f3f3f
 using namespace std;
-typedef long long ll;
-typedef unsigned long long ull;
-typedef vector<int> vi;
-typedef pair<int, int> pii;
-typedef pair<ll, ll> pll;
-const long double PI = acos(-1.0);
-const int INF = 0x3f3f3f3f;
-const double Eps = 1e-7;
-const int N = 1e5+9;
+double EPS=1e-10;
+/*
+题意：
+给定n个点，求凸边形宽的最小值
+思想
+1.计算多边形 y 方向上的端点。 我们称之为 ymin 和 ymax
+2.通过 ymin 和 ymax 构造两条水平切线。 由于他们已经是一对对踵点， 计算他们之间的距离并维护为一个当前最大值。
+3.同时旋转两条线直到其中一条与多边形的一条边重合。
+4.一个新的对踵点对此时产生。 计算新的距离， 并和当前值比较， 并更新。
+5.重复步骤3和步骤4的过程直到 再次产生对踵点对 (ymin,ymax) 。
 
-int main(void) {
-	if(fopen("in", "r")!=NULL) {freopen("in", "r", stdin); freopen("out", "w", stdout);}
+*/
+double add(double a,double b)
+{
+    if(abs(a+b)<EPS*(abs(a)+abs(b))) return 0;
+    return a+b;
+}
 
-	return 0;
+struct point{
+    double x,y;
+    point(){}
+    point(double x,double y):x(x),y(y){
+    }
+    point operator +(point p)
+    {
+        return point(add(x,p.x),add(y,p.y));
+    }
+    point operator -(point p)
+    {
+        return point(add(x,-p.x),add(y,-p.y));
+    }
+    point operator *(double d)
+    {
+        return point(x*d,y*d);
+    }
+    double dot(point p)
+    {
+        return add(x*p.x,y*p.y);
+    }
+    double det(point p)
+    {
+        return add(x*p.y,-y*p.x);
+    }
+};
+double cross_product(point x,point y,point z)
+{
+    return (z-x).det(z-y);
+}
+double dis(point a,point b)
+{
+    return sqrt((a.x-b.x)*(a.x-b.x)+(a.y-b.y)*(a.y-b.y));
+}
+
+/****************/
+/**  旋转卡壳  **/
+/****************/
+double rotating_caliper(vector<point> v)
+{
+    double min_dis = INF;
+    int n = v.size();
+    v.push_back(v[0]);
+    for (int i = 0; i < n; ++i)
+    {
+        double res=0;
+        for(int j=0;j<n;j++)
+        {
+            res=max(res,cross_product(v[i],v[i+1],v[j])/dis(v[i],v[i+1]));
+        }
+        min_dis = min(min_dis,res);
+     }
+     return min_dis;
+/*****************************************************************************************************/
+/***                           优化的思路 但是莫名tle了                                           ***/
+/**    int j = 2;                                                                                  ***/
+/**    for (int i = 0; i < n; ++i)                                                                 ***/
+/**    {                                                                                           ***/
+/**      while (cross_product(v[i], v[i + 1], v[j]) < cross_product(v[i], v[i + 1], v[j + 1]))     ***/
+/**      {                                                                                         ***/
+/**          j = (j + 1) % n;                                                                      ***/
+/**      }                                                                                         ***/
+/**       min_dis = min(min_dis,cross_product(v[i],v[i+1],v[j])/dis(v[i],v[i+1]) );                ***/
+/**    }                                                                                           ***/
+/*****************************************************************************************************/
+}
+
+/****************/
+/**  计算凸包  **/
+/****************/
+
+bool cmp(const point& p,const point& q)
+{
+    if(p.x!=q.x) return p.x<q.x;
+    return p.y<q.y;
+}
+vector<point> convex_hull(point *ps,int n)
+{
+    sort(ps,ps+n,cmp);
+    int k=0;
+    vector<point> qs(n*2);
+    for(int i=0;i<n;i++)
+    {
+        while(k>1&&(qs[k-1]-qs[k-2]).det(ps[i]-qs[k-1])<=0) k--;
+        qs[k++]=ps[i];
+    }
+    for(int i=n-2,t=k;i>=0;i--)
+    {
+        while(k>t&& (qs[k-1]-qs[k-2]).det(ps[i]-qs[k-1])<=0) k--;
+        qs[k++]=ps[i];
+    }
+    qs.resize(k-1);
+    return qs;
+}
+point ps[105];
+int main()
+{
+    int n;
+    cin>>n;
+    int cnt=0;
+    for(int i=0;i<n;i++)
+    {
+        int a,b;
+        scanf("%d%d",&a,&b);
+        ps[cnt++]=point(a,b);
+    }
+    vector<point> qs=convex_hull(ps,n);
+    double res=rotating_caliper(qs);
+    printf("%.10f\n",res);
+    return 0;
 }
 
 ```
@@ -4188,51 +4654,7 @@ while(it != se.end()) {
 ```
 错误的erase示范虽然在Linux系统中能正常编译运行, 但是提交到CF上时出现RE! 经过搜索, 找到了正确示范的那种写法.
 
-## vim 配置
-```
-syntax on
-set nu
-set tabstop=4
-set shiftwidth=4
-colo evening
-set mouse=a
-set cin
-
-map <F2> :call Import() <CR>
-map <F3> :only<CR>:60vsp in<CR>:sp out<CR><C-W><RIGHT>
-nnoremap <F9>   <Esc>:w<CR> :! ctags %<CR> :!g++ -std=c++11 % -o /tmp/a.out && /tmp/a.out<CR>
-map <F10> <Esc>:w<CR>gg"+1000Y
-
-func Import()
-	exec "r ~/code/z"
-endfunc
-```
-
-## 起手式
-```
-#include<bits/stdc++.h>
-#define x first
-#define y second
-#define ok cout << "ok" << endl;
-using namespace std;
-typedef long long ll;
-typedef unsigned long long ull;
-typedef vector<int> vi;
-typedef pair<int, int> pii;
-typedef pair<ll, ll> pll;
-const long double PI = acos(-1.0);
-const int INF = 0x3f3f3f3f;
-const double Eps = 1e-7;
-const int N = 1e5+9;
-
-int main(void) {
-	if(fopen("in", "r")!=NULL) {freopen("in", "r", stdin); freopen("out", "w", stdout);}
-
-	return 0;
-}
-```
-
-
 ## 备注
 1. 积分表另外打印
-
+2. 数学公式另外打印
+3. 上下界网络流另外打印

@@ -17,7 +17,7 @@ nnoremap <F9>   <Esc>:w<CR> :! ctags %<CR> :!g++ -std=c++11 % -o /tmp/a.out && /
 map <F10> <Esc>:w<CR>gg"+1000Y
 
 func Import()
-	exec "r ~/code/z"
+    exec "r ~/code/z"
 endfunc
 ```
 
@@ -39,9 +39,9 @@ const double Eps = 1e-7;
 const int N = 1e5+9;
 
 int main(void) {
-	if(fopen("in", "r")!=NULL) {freopen("in", "r", stdin); freopen("out", "w", stdout);}
+    if(fopen("in", "r")!=NULL) {freopen("in", "r", stdin); freopen("out", "w", stdout);}
 
-	return 0;
+    return 0;
 }
 ```
 
@@ -64,105 +64,105 @@ int triangle[9];
 
 // 给边和三角形编码
 void encode() {
-	edgeID[pii(1, 2)] = 1 << 1; edgeID[pii(1, 3)] = 1 << 2; edgeID[pii(2, 3)] = 1 << 3;
-	edgeID[pii(2, 4)] = 1 << 4; edgeID[pii(2, 5)] = 1 << 5; edgeID[pii(3, 5)] = 1 << 6;
-	edgeID[pii(3, 6)] = 1 << 7; edgeID[pii(4, 5)] = 1 << 8; edgeID[pii(5, 6)] = 1 << 9;
-	edgeID[pii(4, 7)] = 1 << 10; edgeID[pii(4, 8)] = 1 << 11; edgeID[pii(5, 8)] = 1 << 12;
-	edgeID[pii(5, 9)] = 1 << 13; edgeID[pii(6, 9)] = 1 << 14; edgeID[pii(6, 10)] = 1 << 15;
-	edgeID[pii(7, 8)] = 1 << 16; edgeID[pii(8, 9)] = 1 << 17; edgeID[pii(9, 10)] = 1 << 18;
+    edgeID[pii(1, 2)] = 1 << 1; edgeID[pii(1, 3)] = 1 << 2; edgeID[pii(2, 3)] = 1 << 3;
+    edgeID[pii(2, 4)] = 1 << 4; edgeID[pii(2, 5)] = 1 << 5; edgeID[pii(3, 5)] = 1 << 6;
+    edgeID[pii(3, 6)] = 1 << 7; edgeID[pii(4, 5)] = 1 << 8; edgeID[pii(5, 6)] = 1 << 9;
+    edgeID[pii(4, 7)] = 1 << 10; edgeID[pii(4, 8)] = 1 << 11; edgeID[pii(5, 8)] = 1 << 12;
+    edgeID[pii(5, 9)] = 1 << 13; edgeID[pii(6, 9)] = 1 << 14; edgeID[pii(6, 10)] = 1 << 15;
+    edgeID[pii(7, 8)] = 1 << 16; edgeID[pii(8, 9)] = 1 << 17; edgeID[pii(9, 10)] = 1 << 18;
 
-	triangle[0] = (1 << 1) + (1 << 2) + (1 << 3);
-	triangle[1] = (1 << 4) + (1 << 5) + (1 << 8);
-	triangle[2] = (1 << 3) + (1 << 5) + (1 << 6);
-	triangle[3] = (1 << 6) + (1 << 7) + (1 << 9);
-	triangle[4] = (1 << 10) + (1 << 11) + (1 << 16);
-	triangle[5] = (1 << 8) + (1 << 11) + (1 << 12);
-	triangle[6] = (1 << 12) + (1 << 13) + (1 << 17);
-	triangle[7] = (1 << 9) + (1 << 13) + (1 << 14);
-	triangle[8] = (1 << 14) + (1 << 15) + (1 << 18);
+    triangle[0] = (1 << 1) + (1 << 2) + (1 << 3);
+    triangle[1] = (1 << 4) + (1 << 5) + (1 << 8);
+    triangle[2] = (1 << 3) + (1 << 5) + (1 << 6);
+    triangle[3] = (1 << 6) + (1 << 7) + (1 << 9);
+    triangle[4] = (1 << 10) + (1 << 11) + (1 << 16);
+    triangle[5] = (1 << 8) + (1 << 11) + (1 << 12);
+    triangle[6] = (1 << 12) + (1 << 13) + (1 << 17);
+    triangle[7] = (1 << 9) + (1 << 13) + (1 << 14);
+    triangle[8] = (1 << 14) + (1 << 15) + (1 << 18);
 }
 
 // 计算新添加一条边可以获得的分数
 int count(int status, int edgeID) {
-	int ans = 0;
-	for(int i = 0; i < 9; i++) {
-		if((triangle[i] & edgeID) && (triangle[i] & status) == triangle[i])
-			ans++;
-	}
-	return ans;
+    int ans = 0;
+    for(int i = 0; i < 9; i++) {
+        if((triangle[i] & edgeID) && (triangle[i] & status) == triangle[i])
+            ans++;
+    }
+    return ans;
 }
 
 int findMax(int beta, int status, int score);
 
 // 从当前状态status出发，搜索能取到的最低分
 int findMin(int alpha, int status, int score) {
-	// 所有的边都已经添加完，返回
-	if(status == ALLEDGES)
-		return score;
-	int t = 1;
-	// 枚举剩余可取的边
-	int remain = ~status & ALLEDGES;
-	while(remain) {
-		int i = remain & -remain;
-		int newStatus = status | i;
-		int cnt = count(newStatus, i);
-		// 假如添加一边有得分，则可以继续再走一步，否则轮到对方走
-		t = cnt ? min(t, findMin(alpha, newStatus, score - cnt)) : min(t, findMax(t, newStatus, score));
-		// alpha剪枝
-		if(t <= alpha)
-			return alpha;
-		remain -= i;
-	}
-	return t;
+    // 所有的边都已经添加完，返回
+    if(status == ALLEDGES)
+        return score;
+    int t = 1;
+    // 枚举剩余可取的边
+    int remain = ~status & ALLEDGES;
+    while(remain) {
+        int i = remain & -remain;
+        int newStatus = status | i;
+        int cnt = count(newStatus, i);
+        // 假如添加一边有得分，则可以继续再走一步，否则轮到对方走
+        t = cnt ? min(t, findMin(alpha, newStatus, score - cnt)) : min(t, findMax(t, newStatus, score));
+        // alpha剪枝
+        if(t <= alpha)
+            return alpha;
+        remain -= i;
+    }
+    return t;
 }
 
 // 从当前状态status出发，搜索能取到的最高分
 int findMax(int beta, int status, int score) {
-	// 所有的边都已经添加完，返回
-	if(status == ALLEDGES)
-		return score;
-	int t = -1;
-	// 枚举剩余可取的边
-	int remain = ~status & ALLEDGES;
-	while(remain) {
-		int i = remain & -remain;
-		int newStatus = status | i;
-		int cnt = count(newStatus, i);
-		// 假如添加一边有得分，则可以继续再走一步，否则轮到对方走
-		t = cnt ? max(t, findMax(beta, newStatus, score + cnt)) : max(t, findMin(t, newStatus, score));
-		// beta剪枝
-		if(t >= beta)
-			return beta;
-		remain -= i;
-	}
-	return t;
+    // 所有的边都已经添加完，返回
+    if(status == ALLEDGES)
+        return score;
+    int t = -1;
+    // 枚举剩余可取的边
+    int remain = ~status & ALLEDGES;
+    while(remain) {
+        int i = remain & -remain;
+        int newStatus = status | i;
+        int cnt = count(newStatus, i);
+        // 假如添加一边有得分，则可以继续再走一步，否则轮到对方走
+        t = cnt ? max(t, findMax(beta, newStatus, score + cnt)) : max(t, findMin(t, newStatus, score));
+        // beta剪枝
+        if(t >= beta)
+            return beta;
+        remain -= i;
+    }
+    return t;
 }
 
 int main(void) {
-	encode();
-	int allKase, edgeNum;
-	scanf("%d", &allKase);
-	for(int kase = 1; kase <= allKase; kase++) {
-		printf("Game %d: ", kase);
-		scanf("%d", &edgeNum);
-		int score = 0, now = 0, status = 0;
-		for(int i = 0, u, v; i < edgeNum; i++) {
-			scanf("%d%d", &u, &v);
-			if(u > v) {
-				swap(u, v);
-			}
-			status |= edgeID[pii(u, v)];
-			int cnt = count(status, edgeID[pii(u, v)]);
-			// 假如添加一边有得分，则可以继续再走一步，否则轮到对方走
-			if(cnt)
-				score += now == 0 ? cnt : -cnt;
-			else
-				now ^= 1;
-		}
-		printf("%c wins.\n", (now == 0 ? findMax(1, status, score) : findMin(-1, status, score)) > 0 ? 'A' : 'B');
-	}
+    encode();
+    int allKase, edgeNum;
+    scanf("%d", &allKase);
+    for(int kase = 1; kase <= allKase; kase++) {
+        printf("Game %d: ", kase);
+        scanf("%d", &edgeNum);
+        int score = 0, now = 0, status = 0;
+        for(int i = 0, u, v; i < edgeNum; i++) {
+            scanf("%d%d", &u, &v);
+            if(u > v) {
+                swap(u, v);
+            }
+            status |= edgeID[pii(u, v)];
+            int cnt = count(status, edgeID[pii(u, v)]);
+            // 假如添加一边有得分，则可以继续再走一步，否则轮到对方走
+            if(cnt)
+                score += now == 0 ? cnt : -cnt;
+            else
+                now ^= 1;
+        }
+        printf("%c wins.\n", (now == 0 ? findMax(1, status, score) : findMin(-1, status, score)) > 0 ? 'A' : 'B');
+    }
 
-	return 0;
+    return 0;
 }
 /************************************************************/
 ```
@@ -174,77 +174,77 @@ int main(void) {
 /* AC自动机：解决多个模式串匹配问题(Tested 9+ times)
  */
 struct AC {
-	int next[N][26], fail[N], idx, root, end[N]; // 可以修改下数组大小，以防MLE
-	void init() {
-		idx = 0;
-		root = newNode();
-	}
-	int newNode() {
-		for(int i = 0; i < 26; i++)
-			next[idx][i] = -1;
-		end[idx] = 0;
-		return idx++;
-	}
-	void insert(char s[]) {
-		int len = strlen(s), now = root;
-		for(int i = 0; i < len; i++) {
-			if(next[now][s[i] - 'a'] == -1)
-				next[now][s[i] - 'a'] = newNode();
-			now = next[now][s[i] - 'a'];
-		}
-		end[now]++;	//根据实际情况可能需要保存不同的信息
-	}
-	void build() {
-		queue<int> que;
-		fail[root] = root;
-		for(int i = 0; i < 26; i++) {
-			if(next[root][i] == -1) {
-				next[root][i] = root;
-			}
-			else {
-				fail[next[root][i]] = root;
-				que.push(next[root][i]);
-			}
-		}
-		while(que.size()) {
-			int now = que.front();
-			que.pop();
-			for(int i = 0; i < 26; i++) {
-				if(next[now][i] == -1) {
-					next[now][i] = next[fail[now]][i];
-				}
-				else {
-					fail[next[now][i]] = next[fail[now]][i];
-					que.push(next[now][i]);
-				}
-			}
-		}
-	}
-	int query(char s[]) {
-		int ans = 0, len = strlen(s), now = root;
-		for(int i = 0; i < len; i++) {
-			now = next[now][s[i] - 'a'];
-			int temp = now;
-			while(temp != root) {
-				ans += end[temp];
-				end[temp] = 0;		//为避免重复统计，清零。必要时可以设置个flag数组。
-				temp = fail[temp];
-			}
-		}
-		return ans;
-	}
-	void debug() {
-		printf("%37c", ' ');
-		for(int i = 0; i < 26; i++)
-			printf("%2c", i + 'a');
-		printf("\n");
-		for(int i = 0;i < idx;i++) {
-			printf("id = %3d,fail = %3d,end = %3d,chi = [",i,fail[i],end[i]);
-			for(int j = 0;j < 26;j++)
-				printf("%2d",next[i][j]);
-			printf("]\n");
-		}
-	}
+    int next[N][26], fail[N], idx, root, end[N]; // 可以修改下数组大小，以防MLE
+    void init() {
+        idx = 0;
+        root = newNode();
+    }
+    int newNode() {
+        for(int i = 0; i < 26; i++)
+            next[idx][i] = -1;
+        end[idx] = 0;
+        return idx++;
+    }
+    void insert(char s[]) {
+        int len = strlen(s), now = root;
+        for(int i = 0; i < len; i++) {
+            if(next[now][s[i] - 'a'] == -1)
+                next[now][s[i] - 'a'] = newNode();
+            now = next[now][s[i] - 'a'];
+        }
+        end[now]++; //根据实际情况可能需要保存不同的信息
+    }
+    void build() {
+        queue<int> que;
+        fail[root] = root;
+        for(int i = 0; i < 26; i++) {
+            if(next[root][i] == -1) {
+                next[root][i] = root;
+            }
+            else {
+                fail[next[root][i]] = root;
+                que.push(next[root][i]);
+            }
+        }
+        while(que.size()) {
+            int now = que.front();
+            que.pop();
+            for(int i = 0; i < 26; i++) {
+                if(next[now][i] == -1) {
+                    next[now][i] = next[fail[now]][i];
+                }
+                else {
+                    fail[next[now][i]] = next[fail[now]][i];
+                    que.push(next[now][i]);
+                }
+            }
+        }
+    }
+    int query(char s[]) {
+        int ans = 0, len = strlen(s), now = root;
+        for(int i = 0; i < len; i++) {
+            now = next[now][s[i] - 'a'];
+            int temp = now;
+            while(temp != root) {
+                ans += end[temp];
+                end[temp] = 0;      //为避免重复统计，清零。必要时可以设置个flag数组。
+                temp = fail[temp];
+            }
+        }
+        return ans;
+    }
+    void debug() {
+        printf("%37c", ' ');
+        for(int i = 0; i < 26; i++)
+            printf("%2c", i + 'a');
+        printf("\n");
+        for(int i = 0;i < idx;i++) {
+            printf("id = %3d,fail = %3d,end = %3d,chi = [",i,fail[i],end[i]);
+            for(int j = 0;j < 26;j++)
+                printf("%2d",next[i][j]);
+            printf("]\n");
+        }
+    }
 }ac;
 /********************************************************************************/
 ```
@@ -255,61 +255,61 @@ struct AC {
  * 时间复杂度：O(|S| * log(字符集个数))
  */
 const int MAXN = 1e5 + 9;
-const int NN = 26;	//字符集个数
+const int NN = 26;  //字符集个数
 
 struct Palindromic_Tree {
-	int next[MAXN][NN];//next指针，next指针和字典树类似，指向的串为当前串两端加上同一个字符构成
-	int fail[MAXN];//fail指针，失配后跳转到fail指针指向的节点
-	int cnt[MAXN]; //cnt[i]表示i表示的回文字符串在整个字符串中出现了多少次
-	int num[MAXN]; //num[i]表示i表示的回文字符串中有多少个本质不同的字符串（包括本身）
-	int len[MAXN];//len[i]表示节点i表示的回文串的长度
-	int S[MAXN];//存放添加的字符
-	int last;//指向上一个字符所在的节点，方便下一次add
-	int n;//字符数组指针
-	int p;//节点指针
+    int next[MAXN][NN];//next指针，next指针和字典树类似，指向的串为当前串两端加上同一个字符构成
+    int fail[MAXN];//fail指针，失配后跳转到fail指针指向的节点
+    int cnt[MAXN]; //cnt[i]表示i表示的回文字符串在整个字符串中出现了多少次
+    int num[MAXN]; //num[i]表示i表示的回文字符串中有多少个本质不同的字符串（包括本身）
+    int len[MAXN];//len[i]表示节点i表示的回文串的长度
+    int S[MAXN];//存放添加的字符
+    int last;//指向上一个字符所在的节点，方便下一次add
+    int n;//字符数组指针
+    int p;//节点指针
 
-	int newnode(int l) {//新建节点
-		for(int i = 0; i < NN; i++) next[p][i] = 0;
-		cnt[p] = 0;
-		num[p] = 0;
-		len[p] = l;
-		return p++;
-	}
+    int newnode(int l) {//新建节点
+        for(int i = 0; i < NN; i++) next[p][i] = 0;
+        cnt[p] = 0;
+        num[p] = 0;
+        len[p] = l;
+        return p++;
+    }
 
-	void init() {//初始化
-		p = 0;
-		newnode(0);
-		newnode(-1);
-		last = 0;
-		n = 0;
-		S[n] = -1;//开头放一个字符集中没有的字符，减少特判
-		fail[0] = 1;
-	}
+    void init() {//初始化
+        p = 0;
+        newnode(0);
+        newnode(-1);
+        last = 0;
+        n = 0;
+        S[n] = -1;//开头放一个字符集中没有的字符，减少特判
+        fail[0] = 1;
+    }
 
-	int get_fail(int x) {//和KMP一样，失配后找一个尽量最长的
-		while(S[n - len[x] - 1] != S[n]) x = fail[x];
-		return x ;
-	}
+    int get_fail(int x) {//和KMP一样，失配后找一个尽量最长的
+        while(S[n - len[x] - 1] != S[n]) x = fail[x];
+        return x ;
+    }
 
-	// 插入的是字符
-	void add(int c) {
-		c -= 'a';
-		S[++ n] = c;
-		int cur = get_fail(last);//通过上一个回文串找这个回文串的匹配位置
-		if(!next[cur][c]) {//如果这个回文串没有出现过，说明出现了一个新的本质不同的回文串
-			int now = newnode(len[cur] + 2);//新建节点
-			fail[now] = next[get_fail(fail[cur])][c];//和AC自动机一样建立fail指针，以便失配后跳转
-			next[cur][c] = now;
-			num[now] = num[fail[now]] + 1;
-		}
-		last = next[cur][c];
-		cnt[last]++;
-	}
+    // 插入的是字符
+    void add(int c) {
+        c -= 'a';
+        S[++ n] = c;
+        int cur = get_fail(last);//通过上一个回文串找这个回文串的匹配位置
+        if(!next[cur][c]) {//如果这个回文串没有出现过，说明出现了一个新的本质不同的回文串
+            int now = newnode(len[cur] + 2);//新建节点
+            fail[now] = next[get_fail(fail[cur])][c];//和AC自动机一样建立fail指针，以便失配后跳转
+            next[cur][c] = now;
+            num[now] = num[fail[now]] + 1;
+        }
+        last = next[cur][c];
+        cnt[last]++;
+    }
 
-	void count () {
-		for(int i = p - 1; i >= 0; i--) cnt[fail[i]] += cnt[i];
-		//父亲累加儿子的cnt，因为如果fail[v]=u，则u一定是v的子回文串！
-	}
+    void count () {
+        for(int i = p - 1; i >= 0; i--) cnt[fail[i]] += cnt[i];
+        //父亲累加儿子的cnt，因为如果fail[v]=u，则u一定是v的子回文串！
+    }
 }pt;
 /************************************************************/
 ```
@@ -327,48 +327,48 @@ const int CHARSET_SIZE = 26;
 const int MAXN = N << 1;  // 注意在SAM里面开的数组大小应为MAXN，因为长度为n的字符串最多会有2*n个结点
 
 struct SuffixAutomaton {
-	int ch[MAXN][CHARSET_SIZE], len[MAXN], fail[MAXN], sz, last, cntPos[MAXN];
-	int tong[MAXN], topo[MAXN];
-	void init() {
-		len[0] = 0;
-		sz = 1;
-		last = newnode(0);
-	}
-	int newnode(int le) {
-		len[sz] = le;
-		fail[sz] = 0;
-		for(int i = 0; i < CHARSET_SIZE; i++)
-			ch[sz][i] = 0;
-		return sz++;
-	}
-	void insert(int c) {
-		c -= 'a';
-		int v = last, u = newnode(len[v] + 1);
-		last = u;
-		cntPos[u] = 1;
-		for(; v && !ch[v][c]; v = fail[v]) ch[v][c] = u;
-		if(!v){fail[u] = 1; return;}
-		int o = ch[v][c];
-		if(len[v] + 1 == len[o]) fail[u] = o;
-		else {
-			int n = newnode(len[v] + 1);
-			cntPos[n] = 0;
-			memcpy(ch[n], ch[o], sizeof(ch[0]));
-			fail[n] = fail[o];
-			fail[u] = fail[o] = n;
-			for(; ch[v][c] == o; v = fail[v]) ch[v][c] = n;
-		}
-	}
-	void topoSort() {
-		memset(tong, 0, sizeof tong);
-		tong[0] = 1;
-		for(int i = 1; i < sz; i++)
-			tong[len[i]]++;
-		for(int i = 1; i < sz; i++)
-			tong[i] += tong[i - 1];
-		for(int i = sz - 1; i >= 1; i--)
-			topo[--tong[len[i]]] = i;
-	}
+    int ch[MAXN][CHARSET_SIZE], len[MAXN], fail[MAXN], sz, last, cntPos[MAXN];
+    int tong[MAXN], topo[MAXN];
+    void init() {
+        len[0] = 0;
+        sz = 1;
+        last = newnode(0);
+    }
+    int newnode(int le) {
+        len[sz] = le;
+        fail[sz] = 0;
+        for(int i = 0; i < CHARSET_SIZE; i++)
+            ch[sz][i] = 0;
+        return sz++;
+    }
+    void insert(int c) {
+        c -= 'a';
+        int v = last, u = newnode(len[v] + 1);
+        last = u;
+        cntPos[u] = 1;
+        for(; v && !ch[v][c]; v = fail[v]) ch[v][c] = u;
+        if(!v){fail[u] = 1; return;}
+        int o = ch[v][c];
+        if(len[v] + 1 == len[o]) fail[u] = o;
+        else {
+            int n = newnode(len[v] + 1);
+            cntPos[n] = 0;
+            memcpy(ch[n], ch[o], sizeof(ch[0]));
+            fail[n] = fail[o];
+            fail[u] = fail[o] = n;
+            for(; ch[v][c] == o; v = fail[v]) ch[v][c] = n;
+        }
+    }
+    void topoSort() {
+        memset(tong, 0, sizeof tong);
+        tong[0] = 1;
+        for(int i = 1; i < sz; i++)
+            tong[len[i]]++;
+        for(int i = 1; i < sz; i++)
+            tong[i] += tong[i - 1];
+        for(int i = sz - 1; i >= 1; i--)
+            topo[--tong[len[i]]] = i;
+    }
 }sam;
 /************************************************************/
 ```
@@ -870,27 +870,27 @@ const int N = 2e5+5;
 
 struct pre
 {
-	int p[N], dis[N];
-	void init(int n)
-	{
-		memset(dis, 0, sizeof dis);
-		for(int i = 0; i <= n; i ++)
-			p[i] = i;
-	}
-	int Find(int x)
-	{
-		if(x == p[x])	return p[x];
-		int fa = Find(p[x]);
-		dis[x] += dis[p[x]];
-		return p[x] = fa;
-	}
-	void Mix(int x, int y ,int dis_xy)
-	{
-		int fx = Find(x), fy = Find(y);
-		if(fx==fy)	return ;
-		p[fy] = fx;
-		dis[fy] = dis[x] + dis_xy - dis[y];
-	}
+    int p[N], dis[N];
+    void init(int n)
+    {
+        memset(dis, 0, sizeof dis);
+        for(int i = 0; i <= n; i ++)
+            p[i] = i;
+    }
+    int Find(int x)
+    {
+        if(x == p[x])   return p[x];
+        int fa = Find(p[x]);
+        dis[x] += dis[p[x]];
+        return p[x] = fa;
+    }
+    void Mix(int x, int y ,int dis_xy)
+    {
+        int fx = Find(x), fy = Find(y);
+        if(fx==fy)  return ;
+        p[fy] = fx;
+        dis[fy] = dis[x] + dis_xy - dis[y];
+    }
 };
 /************************************************************/
 ```
@@ -994,74 +994,74 @@ int main()
 int t[4*N][4*N], a[N][N], n, m;
 
 void build_y (int vx, int lx, int rx, int vy, int ly, int ry) {
-	if (ly == ry)
-		if (lx == rx)
-			t[vx][vy] = a[lx][ly];
-		else
-			t[vx][vy] = t[vx*2][vy] + t[vx*2+1][vy];
-	else {
-		int my = (ly + ry) / 2;
-		build_y (vx, lx, rx, vy*2, ly, my);
-		build_y (vx, lx, rx, vy*2+1, my+1, ry);
-		t[vx][vy] = t[vx][vy*2] + t[vx][vy*2+1];
-	}
+    if (ly == ry)
+        if (lx == rx)
+            t[vx][vy] = a[lx][ly];
+        else
+            t[vx][vy] = t[vx*2][vy] + t[vx*2+1][vy];
+    else {
+        int my = (ly + ry) / 2;
+        build_y (vx, lx, rx, vy*2, ly, my);
+        build_y (vx, lx, rx, vy*2+1, my+1, ry);
+        t[vx][vy] = t[vx][vy*2] + t[vx][vy*2+1];
+    }
 }
  
 void build_x (int vx, int lx, int rx) {
-	if (lx != rx) {
-		int mx = (lx + rx) / 2;
-		build_x (vx*2, lx, mx);
-		build_x (vx*2+1, mx+1, rx);
-	}
-	build_y (vx, lx, rx, 1, 0, m-1);
+    if (lx != rx) {
+        int mx = (lx + rx) / 2;
+        build_x (vx*2, lx, mx);
+        build_x (vx*2+1, mx+1, rx);
+    }
+    build_y (vx, lx, rx, 1, 0, m-1);
 }
 
 void update_y (int vx, int lx, int rx, int vy, int ly, int ry, int x, int y, int new_val) {
-	if (ly == ry) {
-		if (lx == rx)
-			t[vx][vy] = new_val;
-		else
-			t[vx][vy] = t[vx*2][vy] + t[vx*2+1][vy];
-	}
-	else {
-		int my = (ly + ry) / 2;
-		if (y <= my)
-			update_y (vx, lx, rx, vy*2, ly, my, x, y, new_val);
-		else
-			update_y (vx, lx, rx, vy*2+1, my+1, ry, x, y, new_val);
-		t[vx][vy] = t[vx][vy*2] + t[vx][vy*2+1];
-	}
+    if (ly == ry) {
+        if (lx == rx)
+            t[vx][vy] = new_val;
+        else
+            t[vx][vy] = t[vx*2][vy] + t[vx*2+1][vy];
+    }
+    else {
+        int my = (ly + ry) / 2;
+        if (y <= my)
+            update_y (vx, lx, rx, vy*2, ly, my, x, y, new_val);
+        else
+            update_y (vx, lx, rx, vy*2+1, my+1, ry, x, y, new_val);
+        t[vx][vy] = t[vx][vy*2] + t[vx][vy*2+1];
+    }
 }
  
 void update_x (int vx, int lx, int rx, int x, int y, int new_val) {
-	if (lx != rx) {
-		int mx = (lx + rx) / 2;
-		if (x <= mx)
-			update_x (vx*2, lx, mx, x, y, new_val);
-		else
-			update_x (vx*2+1, mx+1, rx, x, y, new_val);
-	}
-	update_y (vx, lx, rx, 1, 0, m-1, x, y, new_val);
+    if (lx != rx) {
+        int mx = (lx + rx) / 2;
+        if (x <= mx)
+            update_x (vx*2, lx, mx, x, y, new_val);
+        else
+            update_x (vx*2+1, mx+1, rx, x, y, new_val);
+    }
+    update_y (vx, lx, rx, 1, 0, m-1, x, y, new_val);
 }
 
 int sum_y (int vx, int vy, int tly, int try_, int ly, int ry) {
-	if (ly > ry)
-		return 0;
-	if (ly == tly && try_ == ry)
-		return t[vx][vy];
-	int tmy = (tly + try_) / 2;
-	return sum_y (vx, vy*2, tly, tmy, ly, min(ry,tmy))
-		+ sum_y (vx, vy*2+1, tmy+1, try_, max(ly,tmy+1), ry);
+    if (ly > ry)
+        return 0;
+    if (ly == tly && try_ == ry)
+        return t[vx][vy];
+    int tmy = (tly + try_) / 2;
+    return sum_y (vx, vy*2, tly, tmy, ly, min(ry,tmy))
+        + sum_y (vx, vy*2+1, tmy+1, try_, max(ly,tmy+1), ry);
 }
  
 int sum_x (int vx, int tlx, int trx, int lx, int rx, int ly, int ry) {
-	if (lx > rx)
-		return 0;
-	if (lx == tlx && trx == rx)
-		return sum_y (vx, 1, 0, m-1, ly, ry);
-	int tmx = (tlx + trx) / 2;
-	return sum_x (vx*2, tlx, tmx, lx, min(rx,tmx), ly, ry)
-		+ sum_x (vx*2+1, tmx+1, trx, max(lx,tmx+1), rx, ly, ry);
+    if (lx > rx)
+        return 0;
+    if (lx == tlx && trx == rx)
+        return sum_y (vx, 1, 0, m-1, ly, ry);
+    int tmx = (tlx + trx) / 2;
+    return sum_x (vx*2, tlx, tmx, lx, min(rx,tmx), ly, ry)
+        + sum_x (vx*2+1, tmx+1, trx, max(lx,tmx+1), rx, ly, ry);
 }
 /************************************************************/
 ```
@@ -1074,22 +1074,22 @@ int sum_x (int vx, int tlx, int trx, int lx, int rx, int ly, int ry) {
 int n, tree[2*N];
 
 void build(){
-	for(int i=n-1; i>0; i--)
-		tree[i]=tree[i<<1]+tree[i<<1|1];
+    for(int i=n-1; i>0; i--)
+        tree[i]=tree[i<<1]+tree[i<<1|1];
 }
 
 void modify(int p, int value){
-	for(tree[p+=n]=value; p>1; p>>=1)
-		tree[p>>1]=tree[p]+tree[p^1];
+    for(tree[p+=n]=value; p>1; p>>=1)
+        tree[p>>1]=tree[p]+tree[p^1];
 }
 
 int query(int l, int r){
-	int res=0;
-	for(l+=n, r+=n; l<r; l>>=1, r>>=1){
-		if(l&1) res+=tree[l++];
-		if(r&1) res+=tree[--r];
-	}
-	return res;
+    int res=0;
+    for(l+=n, r+=n; l<r; l>>=1, r>>=1){
+        if(l&1) res+=tree[l++];
+        if(r&1) res+=tree[--r];
+    }
+    return res;
 }
 /****************************************/
 ```
@@ -1209,77 +1209,77 @@ int sum[N * 20], tot, rt[N * 20], ls[N * 20], rs[N * 20];
 int T, n, a[N], b[N], sz, l, r, k, q;
 
 void build(int &rt, int l, int r) {
-	rt = ++tot;
-	sum[rt] = 0;
-	if(l == r)
-		return;
-	build(ls[rt], l, mid);
-	build(rs[rt], mid + 1, r);
+    rt = ++tot;
+    sum[rt] = 0;
+    if(l == r)
+        return;
+    build(ls[rt], l, mid);
+    build(rs[rt], mid + 1, r);
 }
 
 void pushup(int rt) {
-	sum[rt] = sum[ls[rt]] + sum[rs[rt]];
+    sum[rt] = sum[ls[rt]] + sum[rs[rt]];
 }
 
 void update(int &rt, int last, int l, int r, int val) {
-	rt = ++tot;
-	if(l == r) {
-		sum[rt] = sum[last] + 1;
-		return;
-	}
+    rt = ++tot;
+    if(l == r) {
+        sum[rt] = sum[last] + 1;
+        return;
+    }
 
-	ls[rt] = ls[last];
-	rs[rt] = rs[last];
+    ls[rt] = ls[last];
+    rs[rt] = rs[last];
 
-	if(val <= mid)
-		update(ls[rt], ls[last], l, mid, val);
-	else
-		update(rs[rt], rs[last], mid + 1, r, val);
-	pushup(rt);
+    if(val <= mid)
+        update(ls[rt], ls[last], l, mid, val);
+    else
+        update(rs[rt], rs[last], mid + 1, r, val);
+    pushup(rt);
 }
 
 int query(int rt1, int rt2, int l, int r, int k) {
-	if(l == r)
-		return l;
-	int cnt = sum[ls[rt2]] - sum[ls[rt1]];
-	if(k <= cnt) {
-		return query(ls[rt1], ls[rt2], l, mid, k);
-	}
-	else {
-		return query(rs[rt1], rs[rt2], mid + 1, r, k - cnt);
-	}
+    if(l == r)
+        return l;
+    int cnt = sum[ls[rt2]] - sum[ls[rt1]];
+    if(k <= cnt) {
+        return query(ls[rt1], ls[rt2], l, mid, k);
+    }
+    else {
+        return query(rs[rt1], rs[rt2], mid + 1, r, k - cnt);
+    }
 }
 
 
 void work() {
-	scanf("%d%d%d", &l, &r, &k);
-	int ans = query(rt[l - 1], rt[r], 1, sz, k);
-	printf("%d\n", b[ans]);
+    scanf("%d%d%d", &l, &r, &k);
+    int ans = query(rt[l - 1], rt[r], 1, sz, k);
+    printf("%d\n", b[ans]);
 }
 
 int main(void) {
-	if(fopen("in", "r")!=NULL) {freopen("in", "r", stdin); freopen("out", "w", stdout);}
-	scanf("%d", &T);
-	while(T--) {
-		scanf("%d%d", &n, &q);
-		for(int i = 1; i <= n; i++) {
-			scanf("%d", a + i);
-			b[i] = a[i];
-		}
-		sort(b + 1, b + n + 1);
-		sz = unique(b + 1, b + n + 1) - (b + 1);
-		tot = 0;
-		build(rt[0], 1, sz);
-		for(int i = 1; i <= n; i++) {
-			a[i] = lower_bound(b + 1, b + sz + 1, a[i]) - b;
-			update(rt[i], rt[i - 1], 1, sz, a[i]);
-		}
-		while(q--) {
-			work();
-		}
-	}
+    if(fopen("in", "r")!=NULL) {freopen("in", "r", stdin); freopen("out", "w", stdout);}
+    scanf("%d", &T);
+    while(T--) {
+        scanf("%d%d", &n, &q);
+        for(int i = 1; i <= n; i++) {
+            scanf("%d", a + i);
+            b[i] = a[i];
+        }
+        sort(b + 1, b + n + 1);
+        sz = unique(b + 1, b + n + 1) - (b + 1);
+        tot = 0;
+        build(rt[0], 1, sz);
+        for(int i = 1; i <= n; i++) {
+            a[i] = lower_bound(b + 1, b + sz + 1, a[i]) - b;
+            update(rt[i], rt[i - 1], 1, sz, a[i]);
+        }
+        while(q--) {
+            work();
+        }
+    }
 
-	return 0;
+    return 0;
 }
 /************************************************************/
 ```
@@ -1312,7 +1312,7 @@ const int M = 1e4 + 9;
 #define mid ((l + r) >> 1)
 
 struct Node {
-	int data, left, right;
+    int data, left, right;
 }tree[N * 50];
 
 vi p, q;
@@ -1320,120 +1320,120 @@ char op[9], O[M];
 int cnt, tot, a[N], b[2 * N], L[M], R[M], sz, K[M], rt[2 * N], n, m, T;
 
 void build(int &rt, int x, int l, int r) {
-	tree[++tot] = tree[rt];
-	rt = tot;
-	tree[rt].data++;
-	if(l == r)
-		return;
-	if(x <= mid)
-		build(tree[rt].left, x, l, mid);
-	else
-		build(tree[rt].right, x, mid + 1, r);
+    tree[++tot] = tree[rt];
+    rt = tot;
+    tree[rt].data++;
+    if(l == r)
+        return;
+    if(x <= mid)
+        build(tree[rt].left, x, l, mid);
+    else
+        build(tree[rt].right, x, mid + 1, r);
 }
 
 void insert(int &rt, int x, int y, int l, int r) {
-	tree[++tot] = tree[rt];
-	rt = tot;
-	tree[rt].data += y;
-	if(l == r)
-		return;
-	if(x <= mid)
-		insert(tree[rt].left, x, y, l, mid);
-	else
-		insert(tree[rt].right, x, y, mid + 1, r);
+    tree[++tot] = tree[rt];
+    rt = tot;
+    tree[rt].data += y;
+    if(l == r)
+        return;
+    if(x <= mid)
+        insert(tree[rt].left, x, y, l, mid);
+    else
+        insert(tree[rt].right, x, y, mid + 1, r);
 }
 
 void bitInsert(int i, int x, int y) {
-	while(i <= n) {
-		insert(rt[i], x, y, 1, sz);
-		i += i & -i;
-	}
+    while(i <= n) {
+        insert(rt[i], x, y, 1, sz);
+        i += i & -i;
+    }
 }
 
 int query(int k, int l, int r) {
-	if(l == r)
-		return l;
-	int cnt1 = 0, cnt2 = 0;
-	for(int i = 0; i < p.size(); i++)
-		cnt1 += tree[tree[p[i]].left].data;
-	for(int i = 0; i < q.size(); i++)
-		cnt2 += tree[tree[q[i]].left].data;
-	if(cnt2 - cnt1 >= k) {
-		for(int i = 0; i < p.size(); i++)
-			p[i] = tree[p[i]].left;
-		for(int i = 0; i < q.size(); i++)
-			q[i] = tree[q[i]].left;
-		return query(k, l, mid);
-	}
-	else {
-		for(int i = 0; i < p.size(); i++)
-			p[i] = tree[p[i]].right;
-		for(int i = 0; i < q.size(); i++)
-			q[i] = tree[q[i]].right;
-		return query(k - (cnt2 - cnt1), mid + 1, r);
-	}
+    if(l == r)
+        return l;
+    int cnt1 = 0, cnt2 = 0;
+    for(int i = 0; i < p.size(); i++)
+        cnt1 += tree[tree[p[i]].left].data;
+    for(int i = 0; i < q.size(); i++)
+        cnt2 += tree[tree[q[i]].left].data;
+    if(cnt2 - cnt1 >= k) {
+        for(int i = 0; i < p.size(); i++)
+            p[i] = tree[p[i]].left;
+        for(int i = 0; i < q.size(); i++)
+            q[i] = tree[q[i]].left;
+        return query(k, l, mid);
+    }
+    else {
+        for(int i = 0; i < p.size(); i++)
+            p[i] = tree[p[i]].right;
+        for(int i = 0; i < q.size(); i++)
+            q[i] = tree[q[i]].right;
+        return query(k - (cnt2 - cnt1), mid + 1, r);
+    }
 }
 
 int solve(int l, int r, int k) {
-	p.clear(); q.clear();
-	if(l > 0)
-		p.push_back(rt[l + n]);
-	q.push_back(rt[r + n]);
-	while(l) {
-		p.push_back(rt[l]);
-		l -= l & -l;
-	}
-	while(r) {
-		q.push_back(rt[r]);
-		r -= r & -r;
-	}
-	return query(k, 1, sz);
+    p.clear(); q.clear();
+    if(l > 0)
+        p.push_back(rt[l + n]);
+    q.push_back(rt[r + n]);
+    while(l) {
+        p.push_back(rt[l]);
+        l -= l & -l;
+    }
+    while(r) {
+        q.push_back(rt[r]);
+        r -= r & -r;
+    }
+    return query(k, 1, sz);
 }
 
 
 int main(void) {
-	if(fopen("in", "r")!=NULL) {freopen("in", "r", stdin); freopen("out", "w", stdout);}
-	scanf("%d", &T);
-	while(T--) {
-		memset(rt, 0, sizeof rt);
-		memset(tree, 0, sizeof tree);
-		scanf("%d%d", &n, &m);
-		cnt = tot = 0;
-		for(int i = 1; i <= n; i++) {
-			scanf("%d", a + i);
-			b[++cnt] = a[i];
-		}
-		for(int i = 1; i <= m; i++) {
-			scanf("%s%d%d", op, &L[i], &R[i]);
-			O[i] = op[0];
-			if(op[0] == 'Q')
-				scanf("%d", &K[i]);
-			else
-				b[++cnt] = R[i];
-		}
-		sort(b + 1, b + cnt + 1);
-		sz = unique(b + 1, b + cnt + 1) - (b + 1);
-		for(int i = 1; i <= n; i++) {
-			a[i] = lower_bound(b + 1, b + sz + 1, a[i]) - b;
-		}
-		for(int i = 1; i <= n; i++) {
-			rt[i + n] = rt[i + n - 1];
-			build(rt[i + n], a[i], 1, sz);
-		}
-		for(int i = 1; i <= m; i++) {
-			if(O[i] == 'C') {
-				bitInsert(L[i], a[L[i]], -1);
-				a[L[i]] = lower_bound(b + 1, b + sz + 1, R[i]) - b;
-				bitInsert(L[i], a[L[i]], 1);
-			}
-			else {
-				int ans = solve(L[i] - 1, R[i], K[i]);
-				printf("%d\n", b[ans]);
-			}
-		}
-	}
+    if(fopen("in", "r")!=NULL) {freopen("in", "r", stdin); freopen("out", "w", stdout);}
+    scanf("%d", &T);
+    while(T--) {
+        memset(rt, 0, sizeof rt);
+        memset(tree, 0, sizeof tree);
+        scanf("%d%d", &n, &m);
+        cnt = tot = 0;
+        for(int i = 1; i <= n; i++) {
+            scanf("%d", a + i);
+            b[++cnt] = a[i];
+        }
+        for(int i = 1; i <= m; i++) {
+            scanf("%s%d%d", op, &L[i], &R[i]);
+            O[i] = op[0];
+            if(op[0] == 'Q')
+                scanf("%d", &K[i]);
+            else
+                b[++cnt] = R[i];
+        }
+        sort(b + 1, b + cnt + 1);
+        sz = unique(b + 1, b + cnt + 1) - (b + 1);
+        for(int i = 1; i <= n; i++) {
+            a[i] = lower_bound(b + 1, b + sz + 1, a[i]) - b;
+        }
+        for(int i = 1; i <= n; i++) {
+            rt[i + n] = rt[i + n - 1];
+            build(rt[i + n], a[i], 1, sz);
+        }
+        for(int i = 1; i <= m; i++) {
+            if(O[i] == 'C') {
+                bitInsert(L[i], a[L[i]], -1);
+                a[L[i]] = lower_bound(b + 1, b + sz + 1, R[i]) - b;
+                bitInsert(L[i], a[L[i]], 1);
+            }
+            else {
+                int ans = solve(L[i] - 1, R[i], K[i]);
+                printf("%d\n", b[ans]);
+            }
+        }
+    }
 
-	return 0;
+    return 0;
 }
 /************************************************************/
 ```
@@ -1466,91 +1466,91 @@ int ans, n, T, m, a[N], vis[N], l, r, kase;
 int tot, rt[N], lson[N * 40], rson[N * 40], sum[N * 40];
 
 void build(int &rt, int l, int r) {
-	rt = ++tot;
-	sum[rt] = 0;
-	if(l == r)
-		return;
-	build(lson[rt], l, mid);
-	build(rson[rt], mid + 1, r);
+    rt = ++tot;
+    sum[rt] = 0;
+    if(l == r)
+        return;
+    build(lson[rt], l, mid);
+    build(rson[rt], mid + 1, r);
 }
 
 void decode(int &l, int &r) {
-	(l += ans) %= n;
-	(r += ans) %= n;
-	l++, r++;
-	if(l > r)
-		swap(l, r);
+    (l += ans) %= n;
+    (r += ans) %= n;
+    l++, r++;
+    if(l > r)
+        swap(l, r);
 }
 
 void update(int &rt, int last, int l, int r, int pos, int x) {
-	rt = ++tot;
-	lson[rt] = lson[last];
-	rson[rt] = rson[last];
-	sum[rt] = sum[last] + x;
-	if(l == r) {
-		return;
-	}
-	if(pos <= mid)
-		update(lson[rt], lson[last], l, mid, pos, x);
-	else
-		update(rson[rt], rson[last], mid + 1, r, pos, x);
+    rt = ++tot;
+    lson[rt] = lson[last];
+    rson[rt] = rson[last];
+    sum[rt] = sum[last] + x;
+    if(l == r) {
+        return;
+    }
+    if(pos <= mid)
+        update(lson[rt], lson[last], l, mid, pos, x);
+    else
+        update(rson[rt], rson[last], mid + 1, r, pos, x);
 }
 
 int queryNum(int rt, int l, int r, int L, int R) {
-	if(L <= l && r <= R) {
-		return sum[rt];
-	}
-	int ans = 0;
-	if(L <= mid)
-		ans += queryNum(lson[rt], l, mid, L, R);
-	if(mid < R)
-		ans += queryNum(rson[rt], mid + 1, r, L, R);
-	return ans;
+    if(L <= l && r <= R) {
+        return sum[rt];
+    }
+    int ans = 0;
+    if(L <= mid)
+        ans += queryNum(lson[rt], l, mid, L, R);
+    if(mid < R)
+        ans += queryNum(rson[rt], mid + 1, r, L, R);
+    return ans;
 }
 
 int queryId(int rt, int l, int r, int k) {
-	if(l == r)
-		return l;
-	if(sum[lson[rt]] >= k)
-		return queryId(lson[rt], l, mid, k);
-	return queryId(rson[rt], mid + 1, r, k - sum[lson[rt]]);
+    if(l == r)
+        return l;
+    if(sum[lson[rt]] >= k)
+        return queryId(lson[rt], l, mid, k);
+    return queryId(rson[rt], mid + 1, r, k - sum[lson[rt]]);
 }
 
 int main(void) {
-	if(fopen("in", "r")!=NULL) {freopen("in", "r", stdin); freopen("out", "w", stdout);}
-	scanf("%d", &T);
-	while(T--) {
-		scanf("%d%d", &n, &m);
-		for(int i = 1; i <= n; i++) {
-			scanf("%d", a + i);
-		}
-		tot = 0;
-		memset(vis, 0, sizeof vis);
-		build(rt[n+1], 1, n);
-		for(int i = n; i >= 1; i--) {
-			int last = rt[i + 1];
-			if(vis[a[i]])
-				update(last, last, 1, n, vis[a[i]], -1);
-			update(rt[i], last, 1, n, i, 1);
-			vis[a[i]] = i;
-		}
-		ans = 0;
-		// cout << queryNum(rt[1], 1, n, 1, 1) << endl;
-		printf("Case #%d:", ++kase);
-		while(m--) {
-			scanf("%d%d", &l, &r);
-			decode(l, r);
-			// cout << l << " " << r << endl;
-			int k = queryNum(rt[l], 1, n, l, r);
-			k = (k + 1) >> 1;
-			// cout << "k: " << k << endl;
-			ans = queryId(rt[l], 1, n, k);
-			printf(" %d", ans);
-		}
-		printf("\n");
-	}
+    if(fopen("in", "r")!=NULL) {freopen("in", "r", stdin); freopen("out", "w", stdout);}
+    scanf("%d", &T);
+    while(T--) {
+        scanf("%d%d", &n, &m);
+        for(int i = 1; i <= n; i++) {
+            scanf("%d", a + i);
+        }
+        tot = 0;
+        memset(vis, 0, sizeof vis);
+        build(rt[n+1], 1, n);
+        for(int i = n; i >= 1; i--) {
+            int last = rt[i + 1];
+            if(vis[a[i]])
+                update(last, last, 1, n, vis[a[i]], -1);
+            update(rt[i], last, 1, n, i, 1);
+            vis[a[i]] = i;
+        }
+        ans = 0;
+        // cout << queryNum(rt[1], 1, n, 1, 1) << endl;
+        printf("Case #%d:", ++kase);
+        while(m--) {
+            scanf("%d%d", &l, &r);
+            decode(l, r);
+            // cout << l << " " << r << endl;
+            int k = queryNum(rt[l], 1, n, l, r);
+            k = (k + 1) >> 1;
+            // cout << "k: " << k << endl;
+            ans = queryId(rt[l], 1, n, k);
+            printf(" %d", ans);
+        }
+        printf("\n");
+    }
 
-	return 0;
+    return 0;
 }
 /************************************************************/
 ```
@@ -1575,43 +1575,43 @@ int a[N], ans[N];
 
 ll solve(int l, int r)
 {
-	//划分并解决子问题
-	int mid = (l+r)>>1;
-	if(l==r)	return 0;
-	ll num = 0;//逆序对的个数
+    //划分并解决子问题
+    int mid = (l+r)>>1;
+    if(l==r)    return 0;
+    ll num = 0;//逆序对的个数
 
-	num += solve(l, mid);
-	num += solve(mid+1, r);
+    num += solve(l, mid);
+    num += solve(mid+1, r);
 
-	//合并子问题
-	
-	//每一次的处理结果，升序保存在ans数组
-	//将属于不同子序列的逆序对个数累加
-	for(int i = l, j = mid+1, k = 0; i<=mid||j<=r; k ++)
-	{
-		if(i>mid)	ans[k] = a[j++];
-		else if(j>r)	ans[k] = a[i++];
-		else if(a[i]<=a[j])	ans[k] = a[i++];
-		else
-		{
-			//出现逆序对
-			ans[k] = a[j++];
-			num += mid-i+1;//B序列中大于a[j]的个数
-		}
-	}
-	for(int i = 0; i <= (r-l); i ++)
-		a[l+i] = ans[i];
-	return num;
+    //合并子问题
+    
+    //每一次的处理结果，升序保存在ans数组
+    //将属于不同子序列的逆序对个数累加
+    for(int i = l, j = mid+1, k = 0; i<=mid||j<=r; k ++)
+    {
+        if(i>mid)   ans[k] = a[j++];
+        else if(j>r)    ans[k] = a[i++];
+        else if(a[i]<=a[j]) ans[k] = a[i++];
+        else
+        {
+            //出现逆序对
+            ans[k] = a[j++];
+            num += mid-i+1;//B序列中大于a[j]的个数
+        }
+    }
+    for(int i = 0; i <= (r-l); i ++)
+        a[l+i] = ans[i];
+    return num;
 }
 
 int main()
 {
-	int n;
-	scanf("%d", &n);
-	for(int i = 0; i < n; i ++)
-		scanf("%d", a+i);
-	printf("%lld\n",solve(0, n-1));
-	return 0;
+    int n;
+    scanf("%d", &n);
+    for(int i = 0; i < n; i ++)
+        scanf("%d", a+i);
+    printf("%lld\n",solve(0, n-1));
+    return 0;
 }
 ```
 
@@ -1634,49 +1634,49 @@ const int N = 1e4+5;
 const int inf = 0x3f3f3f3f;
 struct node
 {
-	double x, y;
+    double x, y;
 }a[N];
 
 bool cmpx(node a, node b)
 {
-	return a.x<b.x;
+    return a.x<b.x;
 }
 
 double dist(node a, node b)
 {
-	return sqrt(pow(a.x-b.x, 2)+pow(a.y-b.y, 2));
+    return sqrt(pow(a.x-b.x, 2)+pow(a.y-b.y, 2));
 }
 
 double solve(int l, int r)
 {
-	if(l==r)	return inf;
-	if(l+1==r)	return dist(a[l], a[r]);
+    if(l==r)    return inf;
+    if(l+1==r)  return dist(a[l], a[r]);
 
-	//划分解决
-	int mid = (l+r)>>1;
-	double st = a[mid].x;//划分依据
-	double d = min(solve(l, mid), solve(mid+1, r));
+    //划分解决
+    int mid = (l+r)>>1;
+    double st = a[mid].x;//划分依据
+    double d = min(solve(l, mid), solve(mid+1, r));
 
-	//在矩形空间内，左边的点跟右边的点一一匹配，合并
-	for(int i = mid; i >= l && st-a[i].x < d; i --)
-		for(int j = mid+1; j <= r && a[j].x-st < d; j ++)
-			d = min(d, dist(a[i], a[j]));
+    //在矩形空间内，左边的点跟右边的点一一匹配，合并
+    for(int i = mid; i >= l && st-a[i].x < d; i --)
+        for(int j = mid+1; j <= r && a[j].x-st < d; j ++)
+            d = min(d, dist(a[i], a[j]));
 
-	return d;
+    return d;
 }
 
 int main()
 {
-	int n;
-	while(scanf("%d", &n), n)
-	{
-		for(int i = 0; i < n; i ++)
-			scanf("%lf%lf", &a[i].x, &a[i].y);
-		sort(a, a+n, cmpx);
-		double ans = solve(0, n-1);
-		if(ans<10000.0)	printf("%.4f\n", ans);
-		else puts("INFINITY");
-	}
+    int n;
+    while(scanf("%d", &n), n)
+    {
+        for(int i = 0; i < n; i ++)
+            scanf("%lf%lf", &a[i].x, &a[i].y);
+        sort(a, a+n, cmpx);
+        double ans = solve(0, n-1);
+        if(ans<10000.0) printf("%.4f\n", ans);
+        else puts("INFINITY");
+    }
     return 0;
 }
 ```
@@ -1703,16 +1703,16 @@ const int maxn = 10005, inf = 0x3f3f3f3f;
 
 struct Edge
 {
-	int to, next, dist;
+    int to, next, dist;
 }edge[maxn<<1];
 int head[maxn], cnt;
 
 void addedge(int u, int v, int w)
 {
-	edge[cnt].to = v;
-	edge[cnt].dist = w;
-	edge[cnt].next = head[u];
-	head[u] = cnt++;
+    edge[cnt].to = v;
+    edge[cnt].dist = w;
+    edge[cnt].next = head[u];
+    head[u] = cnt++;
 }
 
 int n, k, ans;
@@ -1726,113 +1726,113 @@ int root;//根节点
 
 void get_root(int u, int fa)//深搜遍历的同时找寻树的重心root
 {
-	dp[u] = 0;
-	num[u] = 1;//初始化
+    dp[u] = 0;
+    num[u] = 1;//初始化
 
-	for(int i = head[u]; ~i; i  = edge[i].next)
-	{
-		int v = edge[i].to;
-		if(v!=fa && !vis[v]	)
-		{//保证不回溯
-			get_root(v, u);
-			num[u] += num[v];//加上儿子的节点数就是根的节点数
-			dp[u] = max(num[v], dp[u]);//最大联通块大小可能是子树大小
-		}
-	}
-	//最大联通块还有可能是当前树删除子树u之后的树大小
-	dp[u] = max(dp[u] , size - num[u]);
-	//最后跟目前的重心对比
-	if(dp[u]<dp[root])	root = u;
+    for(int i = head[u]; ~i; i  = edge[i].next)
+    {
+        int v = edge[i].to;
+        if(v!=fa && !vis[v] )
+        {//保证不回溯
+            get_root(v, u);
+            num[u] += num[v];//加上儿子的节点数就是根的节点数
+            dp[u] = max(num[v], dp[u]);//最大联通块大小可能是子树大小
+        }
+    }
+    //最大联通块还有可能是当前树删除子树u之后的树大小
+    dp[u] = max(dp[u] , size - num[u]);
+    //最后跟目前的重心对比
+    if(dp[u]<dp[root])  root = u;
 }
 
 int dist[maxn];//到根节点的距离
 inline bool cmp(int i, int j)
 {
-	return dist[i] < dist[j];
+    return dist[i] < dist[j];
 }
 
 void Find_dist(int u, int fa , int d)
 {//计算当前树的所有节点到根的距离，并将点入栈
-	Stack[++top1] = u;
-	dist[u] = d;
-	for(int i = head[u]; ~i ; i = edge[i].next)
-	{
-		int v = edge[i].to;
-		if(vis[v] || v==fa)	continue ;
-		Find_dist(v, u, d+edge[i].dist);
-	}
+    Stack[++top1] = u;
+    dist[u] = d;
+    for(int i = head[u]; ~i ; i = edge[i].next)
+    {
+        int v = edge[i].to;
+        if(vis[v] || v==fa) continue ;
+        Find_dist(v, u, d+edge[i].dist);
+    }
 }
 
 int calc(int l, int r)//计算满足距离≤k的（i，j）个数
 {
-	int j = r, Ans = 0;//此时stack中l到r是按照dist升序排好的，ij一前一后往中间扫
-	for(int i = l; i <= r; i ++)
-	{
-		while(dist[Stack[i]]+dist[Stack[j]]>k && j>i) j--;
-		if(i==j)	break ;
-		Ans += j-i;
-		//Stack[i+1]~Stack[j]都是满足条件的
-	}
-	return Ans;
+    int j = r, Ans = 0;//此时stack中l到r是按照dist升序排好的，ij一前一后往中间扫
+    for(int i = l; i <= r; i ++)
+    {
+        while(dist[Stack[i]]+dist[Stack[j]]>k && j>i) j--;
+        if(i==j)    break ;
+        Ans += j-i;
+        //Stack[i+1]~Stack[j]都是满足条件的
+    }
+    return Ans;
 }
 
 void solve(int u, int fa)
 {
-	dp[0] = maxn;
-	size = num[u];
-	root = 0;
-	
-	get_root(u, fa);//找到重心并将之转换为当前树的根
+    dp[0] = maxn;
+    size = num[u];
+    root = 0;
+    
+    get_root(u, fa);//找到重心并将之转换为当前树的根
 
-	top1 = 0;
-	int top2 = 0;
-	for(int i = head[root]; ~i; i = edge[i].next)
-	{
-		int v = edge[i].to;
-		if(vis[v])	continue;
-		top2 = top1;
-		Find_dist(v, root, edge[i].dist);
-		//top2+1 到top1+1为子树v的所有节点
-		sort(Stack+top2+1, Stack+top1+1, cmp);
-		ans -= calc(top2+1, top1);//减去在同一棵子树且经过根节点（即非最短距离）的答案数
-	}
-	
-	Stack[++top1] = root;
-	dist[root ] = 0;
-	sort(Stack+1, Stack+top1+1, cmp);
-	ans += calc(1, top1);
+    top1 = 0;
+    int top2 = 0;
+    for(int i = head[root]; ~i; i = edge[i].next)
+    {
+        int v = edge[i].to;
+        if(vis[v])  continue;
+        top2 = top1;
+        Find_dist(v, root, edge[i].dist);
+        //top2+1 到top1+1为子树v的所有节点
+        sort(Stack+top2+1, Stack+top1+1, cmp);
+        ans -= calc(top2+1, top1);//减去在同一棵子树且经过根节点（即非最短距离）的答案数
+    }
+    
+    Stack[++top1] = root;
+    dist[root ] = 0;
+    sort(Stack+1, Stack+top1+1, cmp);
+    ans += calc(1, top1);
 
-	vis[root] = 1;
+    vis[root] = 1;
 
-	for(int i = head[root]; ~i; i = edge[i].next)
-		if(!vis[edge[i].to])
-			solve(edge[i].to, root);//分治解决
+    for(int i = head[root]; ~i; i = edge[i].next)
+        if(!vis[edge[i].to])
+            solve(edge[i].to, root);//分治解决
 }
 
 void init()
 {
-	memset(head, -1, sizeof head);
-	memset(vis, 0, sizeof vis);
-	ans = 0;
-	cnt = 0;
+    memset(head, -1, sizeof head);
+    memset(vis, 0, sizeof vis);
+    ans = 0;
+    cnt = 0;
 }
 
 int main()
 {
-	while(scanf("%d %d", &n, &k), n&&k)
-	{
-		init();
-		for(int i = 1; i < n; i ++)
-		{
-			int u, v, d;
-			scanf("%d %d %d", &u, &v, &d);
-			addedge(u, v, d);
-			addedge(v, u, d);
-		}
-		num[1] = n;
-		solve(1, 0);
-		printf("%d\n", ans);
-	}
+    while(scanf("%d %d", &n, &k), n&&k)
+    {
+        init();
+        for(int i = 1; i < n; i ++)
+        {
+            int u, v, d;
+            scanf("%d %d %d", &u, &v, &d);
+            addedge(u, v, d);
+            addedge(v, u, d);
+        }
+        num[1] = n;
+        solve(1, 0);
+        printf("%d\n", ans);
+    }
     return 0;
 }
 ```
@@ -1846,27 +1846,27 @@ int main()
  * V表示背包最大容量
  */
 void zeroPack(int *dp, int w, int v) {
-	for(int i = V; i >= w; i--)
-		dp[i] = max(dp[i], dp[i-w] + v);
+    for(int i = V; i >= w; i--)
+        dp[i] = max(dp[i], dp[i-w] + v);
 }
 
 void completePack(int *dp, int w, int v) {
-	for(int i = w; i <= V; i++)
-		dp[i] = max(dp[i], dp[i-w] + v);
+    for(int i = w; i <= V; i++)
+        dp[i] = max(dp[i], dp[i-w] + v);
 }
 
 void multiPack(int *dp, int w, int v, int num) {
-	if(num*w >= V) {
-		completePack(dp, w, v);
-		return;
-	}
-	int k = 1;
-	while(k < num) {
-		zeroPack(dp, w*k, v*k);
-		num -= k;
-		k *= 2;
-	}
-	zeroPack(dp, w*num, v*num);
+    if(num*w >= V) {
+        completePack(dp, w, v);
+        return;
+    }
+    int k = 1;
+    while(k < num) {
+        zeroPack(dp, w*k, v*k);
+        num -= k;
+        k *= 2;
+    }
+    zeroPack(dp, w*num, v*num);
 }
 /************************************************************/
 ```
@@ -1889,7 +1889,7 @@ void init() {
 int BinSearch(int x, int y, ll v) {
     while(x <= y) {
         int mid = x + (y - x) / 2;
-        if(s[mid] < v) x = mid + 1;		//严格为<或> 非严格为<=或>=
+        if(s[mid] < v) x = mid + 1;     //严格为<或> 非严格为<=或>=
         else y = mid - 1;
     }
     return x;
@@ -1904,7 +1904,7 @@ int LIS() {
         s[pos] = min(s[pos], a[i]);    //上升为min,下降为max
         ans = max(ans, dp[i]);
     }
-	return ans;
+    return ans;
 }
 /************************************************************/
 ```
@@ -1967,10 +1967,10 @@ int main() {
 
 int main ()
 {
-	if (std::regex_match ("subject1233", std::regex("(sub)(.?)(ject)(123)([3-3])") ))
-		std::cout << "string literal matched\n";
+    if (std::regex_match ("subject1233", std::regex("(sub)(.?)(ject)(123)([3-3])") ))
+        std::cout << "string literal matched\n";
 
-	return 0;
+    return 0;
 }
 ```
 
@@ -1981,16 +1981,16 @@ int main ()
  */
 static const int FAC[] = {1, 1, 2, 6, 24, 120, 720, 5040, 40320, 362880};   // 阶乘
 int cantor(int *a, int n) {
-	int x = 0;
-	for (int i = 0; i < n; ++i) {
-		int smaller = 0;  // 在当前位之后小于其的个数
-		for (int j = i + 1; j < n; ++j) {
-			if (a[j] < a[i])
-				smaller++;
-		}
-		x += FAC[n - i - 1] * smaller; // 康托展开累加
-	}
-	return x;  // 康托展开值
+    int x = 0;
+    for (int i = 0; i < n; ++i) {
+        int smaller = 0;  // 在当前位之后小于其的个数
+        for (int j = i + 1; j < n; ++j) {
+            if (a[j] < a[i])
+                smaller++;
+        }
+        x += FAC[n - i - 1] * smaller; // 康托展开累加
+    }
+    return x;  // 康托展开值
 }
 
 
@@ -2025,18 +2025,18 @@ char buf[MAXSIZE];
 ll bufpos;
 
 void init(){
-	buf[fread(buf,1,MAXSIZE,stdin)]='\0';
-	bufpos=0;
+    buf[fread(buf,1,MAXSIZE,stdin)]='\0';
+    bufpos=0;
 }
 
 inline int readint(){
-	bool isneg;
-	int val=0;
-	for(;!isdigit(buf[bufpos]) && buf[bufpos]!='-';bufpos++);
-	bufpos+=(isneg=buf[bufpos]=='-');
-	for(;isdigit(buf[bufpos]);bufpos++)
-		val=val*10+buf[bufpos]-'0';
-	return isneg?-val:val;
+    bool isneg;
+    int val=0;
+    for(;!isdigit(buf[bufpos]) && buf[bufpos]!='-';bufpos++);
+    bufpos+=(isneg=buf[bufpos]=='-');
+    for(;isdigit(buf[bufpos]);bufpos++)
+        val=val*10+buf[bufpos]-'0';
+    return isneg?-val:val;
 }
 /************************************************************/
 ```
@@ -2057,33 +2057,33 @@ int d[MAX_V], V, E;
 //d[i]表示到达顶点i的最短距离, V表示图的实际顶点数, E表示图的实际边数, 下标从0开始
 
 void bellman(int s){
-	for(int i=0; i<V; i++) d[i]=INF;
-	d[s]=0;
-	while(true){
-		bool update=false;
-		for(int i=0; i<E; i++) {
-			edge e = es[i];
-			if (d[e.from]!=INF && d[e.to] > d[e.from] + e.cost) {
-				d[e.to]=d[e.from]+e.cost;
-				update=true;
-			}
-		}
-		if(!update) break;
-	}
+    for(int i=0; i<V; i++) d[i]=INF;
+    d[s]=0;
+    while(true){
+        bool update=false;
+        for(int i=0; i<E; i++) {
+            edge e = es[i];
+            if (d[e.from]!=INF && d[e.to] > d[e.from] + e.cost) {
+                d[e.to]=d[e.from]+e.cost;
+                update=true;
+            }
+        }
+        if(!update) break;
+    }
 }
 
 bool find_nagative_loop() {
-	memset(d, 0, sizeof d);
-	for(int i=0; i<V; i++){
-		for(int j=0; j<E; j++){
-			edge e=es[j];
-			if(d[e.to]>d[e.from]+e.cost){
-				d[e.to]=d[e.from]+e.cost;
-				if(i==V-1) return true;
-			}
-		}
-	}
-	return false;
+    memset(d, 0, sizeof d);
+    for(int i=0; i<V; i++){
+        for(int j=0; j<E; j++){
+            edge e=es[j];
+            if(d[e.to]>d[e.from]+e.cost){
+                d[e.to]=d[e.from]+e.cost;
+                if(i==V-1) return true;
+            }
+        }
+    }
+    return false;
 }
 /************************************************************/
 ```
@@ -2098,22 +2098,22 @@ const int MAX_V=1e5+9;
 int d[MAX_V];
 
 void dijkstra(int s) {
-	priority_queue<pii, vector<pii>, greater<pii> > que;
-	memset(d, INF, sizeof d);
-	d[s] = 0;
-	que.push(pii(0, s));
-	while(!que.empty()) {
-		pii p = que.top(); que.pop();
-		int u = p.second;
-		if(d[u] < p.first) continue;
-		for(int i = head[u]; ~i; i = edge[i].next) {
-			Edge e = edge[i];
-			if(d[e.to] > d[u] + e.cost) {
-				d[e.to] = d[u] + e.cost;
-				que.push(pii(d[e.to], e.to));
-			}
-		}
-	}
+    priority_queue<pii, vector<pii>, greater<pii> > que;
+    memset(d, INF, sizeof d);
+    d[s] = 0;
+    que.push(pii(0, s));
+    while(!que.empty()) {
+        pii p = que.top(); que.pop();
+        int u = p.second;
+        if(d[u] < p.first) continue;
+        for(int i = head[u]; ~i; i = edge[i].next) {
+            Edge e = edge[i];
+            if(d[e.to] > d[u] + e.cost) {
+                d[e.to] = d[u] + e.cost;
+                que.push(pii(d[e.to], e.to));
+            }
+        }
+    }
 }
 /************************************************************/
 ```
@@ -2349,42 +2349,42 @@ int Kruskal(int n)//传入点数，返回最小生成树的权值，如果不连
  */
 void tarjan(int i)
 {
-	int j;
-	DFN[i]=LOW[i]=++Dindex;
-	instack[i]=true;
-	Stap[++Stop]=i;
-	for (edge *e=V[i];e;e=e->next)
-	{
-		j=e->t;
-		if (!DFN[j])
-		{
-			tarjan(j);
-			if (LOW[j]<LOW[i])
-				LOW[i]=LOW[j];
-		}
-		else if (instack[j] && DFN[j]<LOW[i])
-			LOW[i]=DFN[j];
-	}
-	if (DFN[i]==LOW[i])
-	{
-		Bcnt++;
-		do
-		{
-			j=Stap[Stop--];
-			instack[j]=false;
-			Belong[j]=Bcnt;
-		}
-		while (j!=i);
-	}
+    int j;
+    DFN[i]=LOW[i]=++Dindex;
+    instack[i]=true;
+    Stap[++Stop]=i;
+    for (edge *e=V[i];e;e=e->next)
+    {
+        j=e->t;
+        if (!DFN[j])
+        {
+            tarjan(j);
+            if (LOW[j]<LOW[i])
+                LOW[i]=LOW[j];
+        }
+        else if (instack[j] && DFN[j]<LOW[i])
+            LOW[i]=DFN[j];
+    }
+    if (DFN[i]==LOW[i])
+    {
+        Bcnt++;
+        do
+        {
+            j=Stap[Stop--];
+            instack[j]=false;
+            Belong[j]=Bcnt;
+        }
+        while (j!=i);
+    }
 }
 void solve()
 {
-	int i;
-	Stop=Bcnt=Dindex=0;
-	memset(DFN,0,sizeof(DFN));
-	for (i=1;i<=N;i++)
-		if (!DFN[i])
-			tarjan(i);
+    int i;
+    Stop=Bcnt=Dindex=0;
+    memset(DFN,0,sizeof(DFN));
+    for (i=1;i<=N;i++)
+        if (!DFN[i])
+            tarjan(i);
 }
 /************************************************************/
 ```
@@ -2404,58 +2404,58 @@ int degree[MAX_N];
 
 int topo(int n)
 {
-	queue<TYPE>q;
-	memset(degree,0,sizeof(degree));   //注意初始化
-	for(int i=0;i<n;i++)               //注意数据的给法是从0开始还是1开始
-	{
-		for(int j=0;j<g[i].size();j++)
-		{
-			degree[g[i][j]]++;
-		}
-	}
-	for(int i=0;i<n;i++)               //注意数据的给法是从0开始还是1开始
-	{
-		if(degree[i]==0)
-		{
-			q.push(i);
-		}
-	}
-	int tot=0;
-	while(q.size())
-	{
-		int qq=q.front();                  //根据类型修改qq的类型
-		q.pop();
-		tot++;
-		for(int i=0;i<g[qq].size();i++)
-		{
-			degree[g[qq][i]]--;
-			if(degree[g[qq][i]]==0)
-				q.push(g[qq][i]);
-		}
-	}
-	if(tot==n)                           //判断自环
-		return 1;
-	else
-		return 0;
+    queue<TYPE>q;
+    memset(degree,0,sizeof(degree));   //注意初始化
+    for(int i=0;i<n;i++)               //注意数据的给法是从0开始还是1开始
+    {
+        for(int j=0;j<g[i].size();j++)
+        {
+            degree[g[i][j]]++;
+        }
+    }
+    for(int i=0;i<n;i++)               //注意数据的给法是从0开始还是1开始
+    {
+        if(degree[i]==0)
+        {
+            q.push(i);
+        }
+    }
+    int tot=0;
+    while(q.size())
+    {
+        int qq=q.front();                  //根据类型修改qq的类型
+        q.pop();
+        tot++;
+        for(int i=0;i<g[qq].size();i++)
+        {
+            degree[g[qq][i]]--;
+            if(degree[g[qq][i]]==0)
+                q.push(g[qq][i]);
+        }
+    }
+    if(tot==n)                           //判断自环
+        return 1;
+    else
+        return 0;
 }
 int main()
 {
-	int n,m;
-	while(scanf("%d%d",&n,&m)!=EOF)
-	{
-		memset(g,0,sizeof(g));
-		int a,b;
-		for(int i=0;i<m;i++)
-		{
-			scanf("%d%d",&a,&b);
-			g[a].push_back(b);                 //根据TYPE的类型和出度入度的不同，这里会有所不同
-		}
-		if(topo(n))
-			printf("YES\n");
-		else
-			printf("NO\n");
-	}
-	return 0;
+    int n,m;
+    while(scanf("%d%d",&n,&m)!=EOF)
+    {
+        memset(g,0,sizeof(g));
+        int a,b;
+        for(int i=0;i<m;i++)
+        {
+            scanf("%d%d",&a,&b);
+            g[a].push_back(b);                 //根据TYPE的类型和出度入度的不同，这里会有所不同
+        }
+        if(topo(n))
+            printf("YES\n");
+        else
+            printf("NO\n");
+    }
+    return 0;
 }
 /************************************************************/
 ```
@@ -2699,88 +2699,88 @@ int n;
 
 //判断浮点数是否在误差范围内看作等于0
 int sgn(double x) {
-	return (x>eps)-(x<-eps);
+    return (x>eps)-(x<-eps);
 }
 // 高斯消元法解方程组(Gauss-Jordan elimination).(-1表示无解，0表示唯一解，大于0表示无穷解，并返回自由变元的个数)
 int Gauss(int equ,int var) {
-	int i,j,k;
-	int max_r;   // 当前这列绝对值最大的行.
-	int col;     // 当前处理的列.
-	double temp;
-	int free_x_num;
-	int free_index;
-	// 转换为阶梯阵.
-	col=0;    // 当前处理的列.
-	memset(free_x,true,sizeof(free_x));
-	for (k=0;k<equ&&col<var;k++,col++) {
-		max_r=k;
-		for(i=k+1;i<equ;i++) {
-			if(sgn(fabs(a[i][col])-fabs(a[max_r][col]))>0)
-		         max_r=i;
- 		}
- 		if(max_r!=k) {
- 			// 与第k行交换.
- 			for(j=k;j<var+1;j++)
- 			   swap(a[k][j],a[max_r][j]);
-		}
-		if(sgn(a[k][col])==0) {
-			// 说明该col列第k行以下全是0了，则处理当前行的下一列.
-			k--;continue;
-		}
-		for(i=k+1;i<equ;i++) {
-			// 枚举要删去的行.
-			if(sgn(a[i][col])!=0) {
-				temp=a[i][col]/a[k][col];
-				for(j=col;j<var+1;j++) {
-					a[i][j]=a[i][j]-a[k][j]*temp;
-				}
-			}
-		}
-	}
-	for(i=k;i<equ;i++) {
-		if(sgn(a[i][col])!=0)
-		return -1; // 无解
-	}
-	if(k<var) {
-		for(i=k-1;i>=0;i--) {
-			free_x_num=0;
-			for(j=0;j<var;j++) {
-				if(sgn(a[i][j])!=0&&free_x[j])
-				   free_x_num++,free_index=j;
-			}
-			if(free_x_num>1) continue;
-			temp=a[i][var];
-			for(j=0;j<var;j++) {
-				if(sgn(a[i][j])!=0&&j!=free_index)
-				    temp-=a[i][j]*x[j];
-			}
-			x[free_index]=temp/a[i][free_index];
-			free_x[free_index]=0;
-		}
-		return var-k; // 无穷多解，自由变元个数
-	}
-	for(i=var-1;i>=0;i--) {
-		temp=a[i][var];
-		for(j=i+1;j<var;j++) {
-			if(sgn(a[i][j])!=0)
-			  temp-=a[i][j]*x[j];
-		}
-		x[i]=temp/a[i][i];
-	}
-	return 0; // 唯一解
+    int i,j,k;
+    int max_r;   // 当前这列绝对值最大的行.
+    int col;     // 当前处理的列.
+    double temp;
+    int free_x_num;
+    int free_index;
+    // 转换为阶梯阵.
+    col=0;    // 当前处理的列.
+    memset(free_x,true,sizeof(free_x));
+    for (k=0;k<equ&&col<var;k++,col++) {
+        max_r=k;
+        for(i=k+1;i<equ;i++) {
+            if(sgn(fabs(a[i][col])-fabs(a[max_r][col]))>0)
+                 max_r=i;
+        }
+        if(max_r!=k) {
+            // 与第k行交换.
+            for(j=k;j<var+1;j++)
+               swap(a[k][j],a[max_r][j]);
+        }
+        if(sgn(a[k][col])==0) {
+            // 说明该col列第k行以下全是0了，则处理当前行的下一列.
+            k--;continue;
+        }
+        for(i=k+1;i<equ;i++) {
+            // 枚举要删去的行.
+            if(sgn(a[i][col])!=0) {
+                temp=a[i][col]/a[k][col];
+                for(j=col;j<var+1;j++) {
+                    a[i][j]=a[i][j]-a[k][j]*temp;
+                }
+            }
+        }
+    }
+    for(i=k;i<equ;i++) {
+        if(sgn(a[i][col])!=0)
+        return -1; // 无解
+    }
+    if(k<var) {
+        for(i=k-1;i>=0;i--) {
+            free_x_num=0;
+            for(j=0;j<var;j++) {
+                if(sgn(a[i][j])!=0&&free_x[j])
+                   free_x_num++,free_index=j;
+            }
+            if(free_x_num>1) continue;
+            temp=a[i][var];
+            for(j=0;j<var;j++) {
+                if(sgn(a[i][j])!=0&&j!=free_index)
+                    temp-=a[i][j]*x[j];
+            }
+            x[free_index]=temp/a[i][free_index];
+            free_x[free_index]=0;
+        }
+        return var-k; // 无穷多解，自由变元个数
+    }
+    for(i=var-1;i>=0;i--) {
+        temp=a[i][var];
+        for(j=i+1;j<var;j++) {
+            if(sgn(a[i][j])!=0)
+              temp-=a[i][j]*x[j];
+        }
+        x[i]=temp/a[i][i];
+    }
+    return 0; // 唯一解
 }
 int main() {
-	int i,j;
-	while(scanf("%d%d",&equ,&var)!=EOF) {
-		memset(a,0,sizeof(a));
-		for(i=0; i<equ; i++) {
-			for(j=0; j<var+1; j++) {
-				scanf("%lf",&a[i][j]); // 读入增广矩阵
-			}
-		}
-		int free_num=Gauss(equ,var);
-	}
-	return 0;
+    int i,j;
+    while(scanf("%d%d",&equ,&var)!=EOF) {
+        memset(a,0,sizeof(a));
+        for(i=0; i<equ; i++) {
+            for(j=0; j<var+1; j++) {
+                scanf("%lf",&a[i][j]); // 读入增广矩阵
+            }
+        }
+        int free_num=Gauss(equ,var);
+    }
+    return 0;
 }
 ```
 
@@ -2804,102 +2804,102 @@ int x[maxn];         //解集
 bool free_x[maxn];   //标记是否是不确定的变元，初始化为true,确定为0
 
 inline int gcd(int a,int b){
-	return b == 0 ? a : gcd(b, a%b);
+    return b == 0 ? a : gcd(b, a%b);
 }
 
 inline int lcm(int a,int b){
-	return a/gcd(a,b)*b;
+    return a/gcd(a,b)*b;
 }
 
 int Gauss(int equ,int var)
 {
-	int i,j,k;
-	int max_r;     // 当前这列绝对值最大的行.
-	int col;       //当前处理的列
-	int ta,tb;
-	int LCM, temp;
-	int free_x_num;
-	int free_index;
+    int i,j,k;
+    int max_r;     // 当前这列绝对值最大的行.
+    int col;       //当前处理的列
+    int ta,tb;
+    int LCM, temp;
+    int free_x_num;
+    int free_index;
 
-	for(int i=0; i<=var; i++) {
-		x[i]=0;           //初始化解集
-		free_x[i]=true;
-	}
+    for(int i=0; i<=var; i++) {
+        x[i]=0;           //初始化解集
+        free_x[i]=true;
+    }
     //转换为阶梯阵.
-	col=0;        // 当前处理的列
-	for(k=0; k<equ&&col<var; k++,col++) {
-		max_r=k;
-		for(i=k+1; i<equ; i++) {//行变幻
-			if(abs(a[i][col])>abs(a[max_r][col])) max_r=i;
-		}
-		if(max_r!=k) {
-			for(j=k; j<var+1; j++) swap(a[k][j],a[max_r][j]);
-		}
-		if(a[k][col]==0) {
-			k--;
-			continue;
-		}
-		for(i=k+1; i<equ; i++) {
-			if(a[i][col]!=0) {
-				LCM=lcm(abs(a[i][col]),abs(a[k][col]));
-				ta=LCM/abs(a[i][col]);
-				tb=LCM/abs(a[k][col]);
-				if(a[i][col]*a[k][col]<0)  tb=-tb;
-				for(j=col; j<var+1; j++) {
-					a[i][j]=a[i][j]*ta-a[k][j]*tb;
-				}
-			}
-		}
-	}
+    col=0;        // 当前处理的列
+    for(k=0; k<equ&&col<var; k++,col++) {
+        max_r=k;
+        for(i=k+1; i<equ; i++) {//行变幻
+            if(abs(a[i][col])>abs(a[max_r][col])) max_r=i;
+        }
+        if(max_r!=k) {
+            for(j=k; j<var+1; j++) swap(a[k][j],a[max_r][j]);
+        }
+        if(a[k][col]==0) {
+            k--;
+            continue;
+        }
+        for(i=k+1; i<equ; i++) {
+            if(a[i][col]!=0) {
+                LCM=lcm(abs(a[i][col]),abs(a[k][col]));
+                ta=LCM/abs(a[i][col]);
+                tb=LCM/abs(a[k][col]);
+                if(a[i][col]*a[k][col]<0)  tb=-tb;
+                for(j=col; j<var+1; j++) {
+                    a[i][j]=a[i][j]*ta-a[k][j]*tb;
+                }
+            }
+        }
+    }
 
-	for(i=k; i<equ; i++) {
-		if(a[i][col]!=0) return -1;
-		// 无解
-	}
+    for(i=k; i<equ; i++) {
+        if(a[i][col]!=0) return -1;
+        // 无解
+    }
 
-	if(k<var) {
-		// 自由变元有var - k个， 无穷解
-		for(i=k-1; i>=0; i--) {
-			free_x_num=0;
-			for(j=0; j<var; j++) {
-				if(a[i][j]!=0&&free_x[j])
-					free_x_num++,free_index=j;
-			}
-			if(free_x_num>1) continue;    // 无法求解出确定的变元.
-			temp=a[i][var];
-			for(j=0; j<var; j++)
-			{
-				if(a[i][j]!=0&&j!=free_index) temp-=a[i][j]*x[j];
-			}
-			x[free_index]=temp/a[i][free_index];    // 求出该变元.
-			free_x[free_index]=0;      // 该变元是确定的.
-		}
-		return var-k;        // 自由变元有var - k个.
-	}
+    if(k<var) {
+        // 自由变元有var - k个， 无穷解
+        for(i=k-1; i>=0; i--) {
+            free_x_num=0;
+            for(j=0; j<var; j++) {
+                if(a[i][j]!=0&&free_x[j])
+                    free_x_num++,free_index=j;
+            }
+            if(free_x_num>1) continue;    // 无法求解出确定的变元.
+            temp=a[i][var];
+            for(j=0; j<var; j++)
+            {
+                if(a[i][j]!=0&&j!=free_index) temp-=a[i][j]*x[j];
+            }
+            x[free_index]=temp/a[i][free_index];    // 求出该变元.
+            free_x[free_index]=0;      // 该变元是确定的.
+        }
+        return var-k;        // 自由变元有var - k个.
+    }
 
-	for(i=var-1; i>=0; i--) {
-		temp=a[i][var];
-		for(j=i+1; j<var; j++) {
-			if(a[i][j]!=0) temp-=a[i][j]*x[j];
-		}
-		if(temp%a[i][i]!=0) return -2;       // 说明有浮点数解，但无整数解.
-		x[i]=temp/a[i][i];
-	}
-	return 0; // 唯一整数解
+    for(i=var-1; i>=0; i--) {
+        temp=a[i][var];
+        for(j=i+1; j<var; j++) {
+            if(a[i][j]!=0) temp-=a[i][j]*x[j];
+        }
+        if(temp%a[i][i]!=0) return -2;       // 说明有浮点数解，但无整数解.
+        x[i]=temp/a[i][i];
+    }
+    return 0; // 唯一整数解
 }
 
 int main() {//Input :  增广矩阵
-	int i,j;
-	while(scanf("%d%d",&equ,&var)!=EOF) {
-		memset(a,0,sizeof(a));
-		for(i=0; i<equ; i++) {
-			for(j=0; j<var+1; j++) {
-				scanf("%d",&a[i][j]);
-			}
-		}
-		int free_num=Gauss(equ,var);
-	}
-	return 0;
+    int i,j;
+    while(scanf("%d%d",&equ,&var)!=EOF) {
+        memset(a,0,sizeof(a));
+        for(i=0; i<equ; i++) {
+            for(j=0; j<var+1; j++) {
+                scanf("%d",&a[i][j]);
+            }
+        }
+        int free_num=Gauss(equ,var);
+    }
+    return 0;
 }
 ```
 
@@ -3217,63 +3217,63 @@ void init() {
     mo[1] = 1;
     facp[1] = 0;
     for (long long i = 2; i < N; i++) {
-		if (!vis[i]) {
-			prime[cnt ++] = i;
-			mo[i] = -1;
-			facp[i] = 1;
-		}
-		for (long long j = 0, k; j < cnt && (k = i * prime[j]) < N; j++) {
-			vis[k] = 1;
-			facp[k] = facp[i] + 1;
-			if (i % prime[j]) {
-				mo[k] = -mo[i];
-			} else {
-				mo[k] = 0;
-				break;
-			}
-		}
+        if (!vis[i]) {
+            prime[cnt ++] = i;
+            mo[i] = -1;
+            facp[i] = 1;
+        }
+        for (long long j = 0, k; j < cnt && (k = i * prime[j]) < N; j++) {
+            vis[k] = 1;
+            facp[k] = facp[i] + 1;
+            if (i % prime[j]) {
+                mo[k] = -mo[i];
+            } else {
+                mo[k] = 0;
+                break;
+            }
+        }
     }
 }
 
 void sum_mo() {
-	// 对于每一个数字，先把他的因子累加
-	for (int i = 1; i < N; i++) {
-		for (int j = i; j < N; j += i) {
-			sum[facp[i]][j] += mo[j / i]; // 倍数型
-			//                 mo[i]       约数型
-		}
-	}
-	// sum对于facp从小到大累加的
-	for (int i = 1; i < M; i++) {
-		for (int j = 1; j < N; j++) {
-			sum[i][j] += sum[i - 1][j];
-		}
-	}
-	// sum[][j] 前缀和
-	for (int i = 0; i < M; i++) {
-		for (int j = 1; j < N; j++) {
-			sum[i][j] += sum[i][j - 1];
-		}
-	}
+    // 对于每一个数字，先把他的因子累加
+    for (int i = 1; i < N; i++) {
+        for (int j = i; j < N; j += i) {
+            sum[facp[i]][j] += mo[j / i]; // 倍数型
+            //                 mo[i]       约数型
+        }
+    }
+    // sum对于facp从小到大累加的
+    for (int i = 1; i < M; i++) {
+        for (int j = 1; j < N; j++) {
+            sum[i][j] += sum[i - 1][j];
+        }
+    }
+    // sum[][j] 前缀和
+    for (int i = 0; i < M; i++) {
+        for (int j = 1; j < N; j++) {
+            sum[i][j] += sum[i][j - 1];
+        }
+    }
 }
 
 int main() {
-	init();	sum_mo();
-	int T;	scanf("%d", &T);
-	while (T--) {
-		int n, m, p;
-		scanf ("%d%d%d", &n, &m, &p);
-		p = min(p, 19);
-		long long ans = 0;
-		for (int i = 1; i <= min(n, m);) {
-			long long a = n / i, b = m / i;
-			int now = min(n / a, m / b);
-			ans += a * b * (sum[p][now] - sum[p][i - 1]); // [i, now]中，n/a, m/b 不变
-			i = now + 1;
-		}
-		cout << ans << endl;
-	}
-	return 0;
+    init(); sum_mo();
+    int T;  scanf("%d", &T);
+    while (T--) {
+        int n, m, p;
+        scanf ("%d%d%d", &n, &m, &p);
+        p = min(p, 19);
+        long long ans = 0;
+        for (int i = 1; i <= min(n, m);) {
+            long long a = n / i, b = m / i;
+            int now = min(n / a, m / b);
+            ans += a * b * (sum[p][now] - sum[p][i - 1]); // [i, now]中，n/a, m/b 不变
+            i = now + 1;
+        }
+        cout << ans << endl;
+    }
+    return 0;
 }
 ```
 
@@ -3293,17 +3293,17 @@ void getinv()
  * inv_extgcd(a, p: 拓展欧几里得求a关于p的逆元(Untested)
  * getFac(): 线性求MAXN个逆元、阶乘以及阶乘的逆元(Untested)
  */
-ll pow_mod(ll a, ll b, ll p) {	//辅助函数
-	ll ret = 1;
-	while(b) {
-		if(b & 1) ret = (ret * a) % p;
-		a = (a * a) % p;
-		b >>= 1;
-	}
-	return ret;
+ll pow_mod(ll a, ll b, ll p) {  //辅助函数
+    ll ret = 1;
+    while(b) {
+        if(b & 1) ret = (ret * a) % p;
+        a = (a * a) % p;
+        b >>= 1;
+    }
+    return ret;
 }
 
-void ex_gcd(ll a, ll b, ll &x, ll &y, ll &d){	//辅助函数
+void ex_gcd(ll a, ll b, ll &x, ll &y, ll &d){   //辅助函数
     if (!b) {d = a, x = 1, y = 0;}
     else{
         ex_gcd(b, a % b, y, x, d);
@@ -3311,11 +3311,11 @@ void ex_gcd(ll a, ll b, ll &x, ll &y, ll &d){	//辅助函数
     }
 }
 
-ll inv_Fermat(ll a, ll p) {			//费马小定理求a关于p的逆元 
-	return pow_mod(a, p-2, p);
+ll inv_Fermat(ll a, ll p) {         //费马小定理求a关于p的逆元 
+    return pow_mod(a, p-2, p);
 }
 
-ll inv_extgcd(ll a, ll p) {			//欧几里得求a关于p的逆元, 如果不存在，返回-1 
+ll inv_extgcd(ll a, ll p) {         //欧几里得求a关于p的逆元, 如果不存在，返回-1 
     ll d, x, y;
     ex_gcd(a, p, x, y, d);
     return d == 1 ? (x % p + p) % p : -1;
@@ -3324,16 +3324,16 @@ ll inv_extgcd(ll a, ll p) {			//欧几里得求a关于p的逆元, 如果不存�
 const int MAXN = 1e5;
 ll fac[MAXN + 9], ifac[MAXN + 9], inv[MAXN + 9];
 
-void getFac() {		//线性求MAXN个逆元、阶乘以及阶乘的逆元
-	fac[0] = 1;
-	for(int i = 1; i <= MAXN; i++)
-		fac[i] = fact[i-1] * i % mod;
-	inv[1] = 1;
-	for (int i = 2; i <= MAXN; i++)
-		inv[i] = (mod - mod / i) * 1LL * inv[mod % i] % mod;
-	ifac[0] = 1;
-	for(int i = 1; i <= MAXN; i++)
-		ifac[i] = ifac[i-1] * inv[i] % mod;
+void getFac() {     //线性求MAXN个逆元、阶乘以及阶乘的逆元
+    fac[0] = 1;
+    for(int i = 1; i <= MAXN; i++)
+        fac[i] = fact[i-1] * i % mod;
+    inv[1] = 1;
+    for (int i = 2; i <= MAXN; i++)
+        inv[i] = (mod - mod / i) * 1LL * inv[mod % i] % mod;
+    ifac[0] = 1;
+    for(int i = 1; i <= MAXN; i++)
+        ifac[i] = ifac[i-1] * inv[i] % mod;
 }
 /************************************************************/
 ```
@@ -3363,53 +3363,53 @@ const double Eps = 1e-7;
 const int N = 1e6+9;
 
 struct Node {
-	int l, r, block, id;
-	bool operator < (const Node &rhs) const {
-		if(block == rhs.block) return r < rhs.r;
-		return block < rhs.block;
-	}
+    int l, r, block, id;
+    bool operator < (const Node &rhs) const {
+        if(block == rhs.block) return r < rhs.r;
+        return block < rhs.block;
+    }
 }q[N];
 
 int n, m, a[N], len, cnt[N], an[N];
 
 int main(void) {
-	if(fopen("in", "r")!=NULL) {freopen("in", "r", stdin); freopen("out", "w", stdout);}
-	while(~scanf("%d", &n)) {
-		len = sqrt(n);
-		for(int i = 1; i <= n; i++) {
-			scanf("%d", a + i);
-		}
-		scanf("%d", &m);
-		for(int i = 0; i < m; i++) {
-			scanf("%d%d", &q[i].l, &q[i].r);
-			q[i].block = q[i].l / len;
-			q[i].id = i;
-		}
-		sort(q, q + m);
-		int l = 1, r = 0, ans = 0;
-		memset(cnt, 0, sizeof cnt);
-		for(int i = 0; i < m; i++) {
-			Node t = q[i];
-			while(r < t.r) {
-				ans += (++cnt[a[++r]] == 1);
-			}
-			while(l > t.l) {
-				ans += (++cnt[a[--l]] == 1);
-			}
-			while(r > t.r) {
-				ans -= (--cnt[a[r--]] == 0);
-			}
-			while(l < t.l) {
-				ans -= (--cnt[a[l++]] == 0);
-			}
-			an[t.id] = ans;
-		}
-		for(int i = 0; i < m; i++) {
-			printf("%d%c", an[i], " \n"[i == m - 1]);
-		}
-	}
+    if(fopen("in", "r")!=NULL) {freopen("in", "r", stdin); freopen("out", "w", stdout);}
+    while(~scanf("%d", &n)) {
+        len = sqrt(n);
+        for(int i = 1; i <= n; i++) {
+            scanf("%d", a + i);
+        }
+        scanf("%d", &m);
+        for(int i = 0; i < m; i++) {
+            scanf("%d%d", &q[i].l, &q[i].r);
+            q[i].block = q[i].l / len;
+            q[i].id = i;
+        }
+        sort(q, q + m);
+        int l = 1, r = 0, ans = 0;
+        memset(cnt, 0, sizeof cnt);
+        for(int i = 0; i < m; i++) {
+            Node t = q[i];
+            while(r < t.r) {
+                ans += (++cnt[a[++r]] == 1);
+            }
+            while(l > t.l) {
+                ans += (++cnt[a[--l]] == 1);
+            }
+            while(r > t.r) {
+                ans -= (--cnt[a[r--]] == 0);
+            }
+            while(l < t.l) {
+                ans -= (--cnt[a[l++]] == 0);
+            }
+            an[t.id] = ans;
+        }
+        for(int i = 0; i < m; i++) {
+            printf("%d%c", an[i], " \n"[i == m - 1]);
+        }
+    }
 
-	return 0;
+    return 0;
 }
 /************************************************************/
 ```
@@ -3441,90 +3441,90 @@ char c;
 int len, n, m, a[N], cnt[N], l, r, ans, an[N], timer, tot, last[N], flag[N];
 
 inline void sub(int pos) {
-	ans -= (--cnt[a[pos]] == 0);
-	flag[pos] = 0;
+    ans -= (--cnt[a[pos]] == 0);
+    flag[pos] = 0;
 }
 
 inline void add(int pos) {
-	ans += (++cnt[a[pos]] == 1);
-	flag[pos] = 1;
+    ans += (++cnt[a[pos]] == 1);
+    flag[pos] = 1;
 }
 
 inline void modify(int pos, int val) {
-	if(!flag[pos])
-		a[pos] = val;
-	else {
-		sub(pos);
-		a[pos] = val;
-		add(pos);
-	}
+    if(!flag[pos])
+        a[pos] = val;
+    else {
+        sub(pos);
+        a[pos] = val;
+        add(pos);
+    }
 }
 
 struct Node {
-	int l, r, id, lblock, rblock, timer;
-	Node () {}
-	Node (int l, int r, int id, int timer): l(l), r(r), id(id), timer(timer) {
-		lblock = l / len;
-		rblock = r / len;
-	}
-	bool operator < (const Node &rhs) const {
-		if(lblock != rhs.lblock) return lblock < rhs.lblock;
-		else if(rblock != rhs.rblock) return rblock < rhs.rblock;
-		return timer < rhs.timer;
-	}
+    int l, r, id, lblock, rblock, timer;
+    Node () {}
+    Node (int l, int r, int id, int timer): l(l), r(r), id(id), timer(timer) {
+        lblock = l / len;
+        rblock = r / len;
+    }
+    bool operator < (const Node &rhs) const {
+        if(lblock != rhs.lblock) return lblock < rhs.lblock;
+        else if(rblock != rhs.rblock) return rblock < rhs.rblock;
+        return timer < rhs.timer;
+    }
 }q[N];
 
 struct Node1 {
-	int pos, val, last;
-	Node1 () {}
-	Node1 (int pos, int val, int last): pos(pos), val(val), last(last) {}
+    int pos, val, last;
+    Node1 () {}
+    Node1 (int pos, int val, int last): pos(pos), val(val), last(last) {}
 }chg[N];
 
 int main(void) {
-	if(fopen("in", "r")!=NULL) {freopen("in", "r", stdin); freopen("out", "w", stdout);}
-	while(~scanf("%d%d", &n, &m)) {
-		len = pow(n, 2.0 / 3);
-		timer = tot = 0;
-		for(int i = 1; i <= n; i++) {
-			scanf("%d", a + i);
-			last[i] = a[i];
-		}
-		for(int i = 0; i < m; i++) {
-			scanf(" %c%d%d", &c, &l, &r);
-			if(c == 'Q') {
-				q[tot] = Node{l, r, tot, timer};
-				tot++;
-			}
-			else {
-				chg[++timer] = Node1{l, r, last[l]};
-				last[l] = r;
-			}
-		}
-		sort(q, q + tot);
-		l = 1, r = ans = timer = 0;
-		memset(cnt, 0, sizeof cnt);
-		for(int i = 0; i < tot; i++) {
-			Node t = q[i];
-			while(timer < t.timer) {
-				timer++;
-				modify(chg[timer].pos, chg[timer].val);
-			}
-			while(timer > t.timer) {
-				modify(chg[timer].pos, chg[timer].last);
-				timer--;
-			}
-			while(r < t.r) add(++r);
-			while(l > t.l) add(--l);
-			while(r > t.r) sub(r--);
-			while(l < t.l) sub(l++);
-			an[t.id] = ans;
-		}
-		for(int i = 0; i < tot; i++) {
-			printf("%d\n", an[i]);
-		}
-	}
+    if(fopen("in", "r")!=NULL) {freopen("in", "r", stdin); freopen("out", "w", stdout);}
+    while(~scanf("%d%d", &n, &m)) {
+        len = pow(n, 2.0 / 3);
+        timer = tot = 0;
+        for(int i = 1; i <= n; i++) {
+            scanf("%d", a + i);
+            last[i] = a[i];
+        }
+        for(int i = 0; i < m; i++) {
+            scanf(" %c%d%d", &c, &l, &r);
+            if(c == 'Q') {
+                q[tot] = Node{l, r, tot, timer};
+                tot++;
+            }
+            else {
+                chg[++timer] = Node1{l, r, last[l]};
+                last[l] = r;
+            }
+        }
+        sort(q, q + tot);
+        l = 1, r = ans = timer = 0;
+        memset(cnt, 0, sizeof cnt);
+        for(int i = 0; i < tot; i++) {
+            Node t = q[i];
+            while(timer < t.timer) {
+                timer++;
+                modify(chg[timer].pos, chg[timer].val);
+            }
+            while(timer > t.timer) {
+                modify(chg[timer].pos, chg[timer].last);
+                timer--;
+            }
+            while(r < t.r) add(++r);
+            while(l > t.l) add(--l);
+            while(r > t.r) sub(r--);
+            while(l < t.l) sub(l++);
+            an[t.id] = ans;
+        }
+        for(int i = 0; i < tot; i++) {
+            printf("%d\n", an[i]);
+        }
+    }
 
-	return 0;
+    return 0;
 }
 /************************************************************/
 ```
@@ -3613,10 +3613,10 @@ König定理是一个二分图中很重要的定理，它的意思是，一个�
 2. 最小路径覆盖=最小路径覆盖＝｜G｜－最大匹配数
  在一个N*N的有向图中，路径覆盖就是在图中找一些路经，使之覆盖了图中的所有顶点，且任何一个顶点有且只有一条路径与之关联；（如果把这些路径中的每条路径从它的起始点走到它的终点，那么恰好可以经过图中的每个顶点一次且仅一次）；如果不考虑图中存在回路，那么每每条路径就是一个弱连通子集．
 由上面可以得出：
-	1.一个单独的顶点是一条路径；
-	2.如果存在一路径p1,p2,......pk，其中p1 为起点，pk为终点，那么在覆盖图中，顶点p1,p2,......pk不再与其它的顶点之间存在有向边．
-	最小路径覆盖就是找出最小的路径条数，使之成为G的一个路径覆盖．
-	 路径覆盖与二分图匹配的关系：最小路径覆盖＝｜G｜－最大匹配数；
+    1.一个单独的顶点是一条路径；
+    2.如果存在一路径p1,p2,......pk，其中p1 为起点，pk为终点，那么在覆盖图中，顶点p1,p2,......pk不再与其它的顶点之间存在有向边．
+    最小路径覆盖就是找出最小的路径条数，使之成为G的一个路径覆盖．
+     路径覆盖与二分图匹配的关系：最小路径覆盖＝｜G｜－最大匹配数；
 3. 二分图最大独立集=顶点数-二分图最大匹配
 独立集：图中任意两个顶点都不相连的顶点集合。
 
@@ -3627,47 +3627,47 @@ König定理是一个二分图中很重要的定理，它的意思是，一个�
  * 先确定点数V，然后使用init()进行初始化，再调用hungary()，返回最大匹配对数
  */
 
-const int MAX_V = 1e5;	//点数的最大值
+const int MAX_V = 1e5;  //点数的最大值
 
-int V;					//点数，从0开始编号
-vector<int> G[MAX_V];	//使用vector存邻接边
+int V;                  //点数，从0开始编号
+vector<int> G[MAX_V];   //使用vector存邻接边
 int match[MAX_V];
 bool used[MAX_V];
 
 void init() {
-	for(int i = 0; i < V; i++)
-		G[i].clear();
+    for(int i = 0; i < V; i++)
+        G[i].clear();
 }
 
 void add_edge(int u, int v) {
-	G[u].push_back(v);
-	G[v].push_back(u);
+    G[u].push_back(v);
+    G[v].push_back(u);
 }
 
 bool dfs(int v) {
-	used[v]=true;
-	for(int i = 0; i < G[v].size(); i++) {
-		int u = G[v][i], w = match[u];
-		if(w < 0 || (!used[w] && dfs(w))) {
-			match[v] = u;
-			match[u] = v;
-			return true;
-		}
-	}
-	return false;
+    used[v]=true;
+    for(int i = 0; i < G[v].size(); i++) {
+        int u = G[v][i], w = match[u];
+        if(w < 0 || (!used[w] && dfs(w))) {
+            match[v] = u;
+            match[u] = v;
+            return true;
+        }
+    }
+    return false;
 }
 
 int hungary() {
-	int res=0;
-	memset(match, -1, sizeof match);
-	for(int v = 0; v < V; v++) {
-		if(match[v] < 0) {
-			memset(used, 0, sizeof used);
-			if(dfs(v))
-				res++;
-		}
-	}
-	return res;
+    int res=0;
+    memset(match, -1, sizeof match);
+    for(int v = 0; v < V; v++) {
+        if(match[v] < 0) {
+            memset(used, 0, sizeof used);
+            if(dfs(v))
+                res++;
+        }
+    }
+    return res;
 }
 
 /******************************************************************/
@@ -3683,35 +3683,35 @@ int hungary() {
 const int MAXN = 1009;
 const int MAXM = 509;
 int uN,vN;
-int g[MAXN][MAXM];		//下标从0开始
+int g[MAXN][MAXM];      //下标从0开始
 int linker[MAXM][MAXN];
 bool used[MAXM];
 int num[MAXM];//右边最大的匹配数
 bool dfs(int u){
-	for(int v = 0; v < vN;v++)
-		if(g[u][v] && !used[v]){
-			used[v] = true;
-			if(linker[v][0] < num[v]){
-				linker[v][++linker[v][0]] = u;
-				return true;
-			}
-			for(int i = 1;i <= num[v];i++)
-				if(dfs(linker[v][i])){
-					linker[v][i] = u;
-					return true;
-				}
-		}
-	return false;
+    for(int v = 0; v < vN;v++)
+        if(g[u][v] && !used[v]){
+            used[v] = true;
+            if(linker[v][0] < num[v]){
+                linker[v][++linker[v][0]] = u;
+                return true;
+            }
+            for(int i = 1;i <= num[v];i++)
+                if(dfs(linker[v][i])){
+                    linker[v][i] = u;
+                    return true;
+                }
+        }
+    return false;
 }
 int hungary(){
-	int res = 0;
-	for(int i = 0;i < vN;i++)
-		linker[i][0] = 0;		//初始化右边第i点的已匹配点数为0
-	for(int u = 0; u < uN; u++){
-		memset(used,false,sizeof(used));
-		if(dfs(u))res++;
-	}
-	return res;
+    int res = 0;
+    for(int i = 0;i < vN;i++)
+        linker[i][0] = 0;       //初始化右边第i点的已匹配点数为0
+    for(int u = 0; u < uN; u++){
+        memset(used,false,sizeof(used));
+        if(dfs(u))res++;
+    }
+    return res;
 }
 /************************************************************/
 ```
@@ -3728,75 +3728,75 @@ int hungary(){
  */
 
 const int N = 310;
-int nx,ny;					//两边的点数
-int g[N][N];				//二分图描述
-int linker[N],lx[N],ly[N];	//y 中各点匹配状态,x,y 中的点标号
+int nx,ny;                  //两边的点数
+int g[N][N];                //二分图描述
+int linker[N],lx[N],ly[N];  //y 中各点匹配状态,x,y 中的点标号
 int slack[N];
 bool visx[N],visy[N];
 bool DFS(int x){
-	visx[x] = true;
-	for(int y = 0; y < ny; y++){
-		if(visy[y])continue;
-		int tmp = lx[x] + ly[y] - g[x][y];
-		if(tmp == 0){
-			visy[y] = true;
-			if(linker[y] == - 1 || DFS(linker[y])){
-				linker[y] = x;
-				return true;
-			}
-		}
-		else if(slack[y] > tmp)
-			slack[y] = tmp;
-	}
-	return false;
+    visx[x] = true;
+    for(int y = 0; y < ny; y++){
+        if(visy[y])continue;
+        int tmp = lx[x] + ly[y] - g[x][y];
+        if(tmp == 0){
+            visy[y] = true;
+            if(linker[y] == - 1 || DFS(linker[y])){
+                linker[y] = x;
+                return true;
+            }
+        }
+        else if(slack[y] > tmp)
+            slack[y] = tmp;
+    }
+    return false;
 }
 int KM(){
-	memset(linker, - 1,sizeof(linker));
-	memset(ly,0,sizeof(ly));
-	for(int i = 0;i < nx;i++){
-		lx[i] = - INF;
-		for(int j = 0;j < ny;j++)
-			if(g[i][j] > lx[i])
-				lx[i] = g[i][j];
-	}
-	for(int x = 0;x < nx;x++){
-		for(int i = 0;i < ny;i++)
-			slack[i] = INF;
-		while(true){
-			memset(visx,false,sizeof(visx));
-			memset(visy,false,sizeof(visy));
-			if(DFS(x))break;
-			int d = INF;
-			for(int i = 0;i < ny;i++)
-				if(!visy[i] && d > slack[i])
-					d = slack[i];
-			for(int i = 0;i < nx;i++)
-				if(visx[i])
-					lx[i] -= d;
-			for(int i = 0;i < ny;i++){
-				if(visy[i])ly[i] += d;
-				else slack[i] -= d;
-			}
-		}
-	}
-	int res = 0;
-	for(int i = 0;i < ny;i++)
-		if(linker[i] != -1)
-			res += g[linker[i]][i];
-	return res;
+    memset(linker, - 1,sizeof(linker));
+    memset(ly,0,sizeof(ly));
+    for(int i = 0;i < nx;i++){
+        lx[i] = - INF;
+        for(int j = 0;j < ny;j++)
+            if(g[i][j] > lx[i])
+                lx[i] = g[i][j];
+    }
+    for(int x = 0;x < nx;x++){
+        for(int i = 0;i < ny;i++)
+            slack[i] = INF;
+        while(true){
+            memset(visx,false,sizeof(visx));
+            memset(visy,false,sizeof(visy));
+            if(DFS(x))break;
+            int d = INF;
+            for(int i = 0;i < ny;i++)
+                if(!visy[i] && d > slack[i])
+                    d = slack[i];
+            for(int i = 0;i < nx;i++)
+                if(visx[i])
+                    lx[i] -= d;
+            for(int i = 0;i < ny;i++){
+                if(visy[i])ly[i] += d;
+                else slack[i] -= d;
+            }
+        }
+    }
+    int res = 0;
+    for(int i = 0;i < ny;i++)
+        if(linker[i] != -1)
+            res += g[linker[i]][i];
+    return res;
 }
 //HDU 2255
 //int main(){
-//	if(fopen("in", "r")!=NULL) {freopen("in", "r", stdin); freopen("out", "w", stdout);}
-//	int n;
-//	while(scanf("%d",&n) == 1){
-//		for(int i = 0;i < n;i++)
-//			for(int j = 0;j < n;j++)
-//				scanf("%d",&g[i][j]);
-//		nx = ny = n;
-//		printf("%d\n",KM());
-//	}
-//	return 0;
+//  if(fopen("in", "r")!=NULL) {freopen("in", "r", stdin); freopen("out", "w", stdout);}
+//  int n;
+//  while(scanf("%d",&n) == 1){
+//      for(int i = 0;i < n;i++)
+//          for(int j = 0;j < n;j++)
+//              scanf("%d",&g[i][j]);
+//      nx = ny = n;
+//      printf("%d\n",KM());
+//  }
+//  return 0;
 //}
 
 /************************************************************/
@@ -3818,92 +3818,92 @@ const int EDGE_NUM = 1e5 + 9;  // 表示图的最大边数
 int tot, head[NODE_NUM], headrev[NODE_NUM], h[NODE_NUM];
 
 struct Edge {
-	int to, cost, next;
-	Edge() {}
-	Edge(int to, int cost, int next): to(to), cost(cost), next(next) {}
+    int to, cost, next;
+    Edge() {}
+    Edge(int to, int cost, int next): to(to), cost(cost), next(next) {}
 }edge[EDGE_NUM << 1];
 
 void init() {
-	tot = 0;
-	memset(head, -1, sizeof head);
-	memset(headrev, -1, sizeof headrev);
+    tot = 0;
+    memset(head, -1, sizeof head);
+    memset(headrev, -1, sizeof headrev);
 }
 
 void addedge(int u, int v, int cost) {
-	edge[tot] = Edge{v, cost, head[u]};
-	head[u] = tot++;
-	edge[tot] = Edge{u, cost, headrev[v]};
-	headrev[v] = tot++;
+    edge[tot] = Edge{v, cost, head[u]};
+    head[u] = tot++;
+    edge[tot] = Edge{u, cost, headrev[v]};
+    headrev[v] = tot++;
 }
 
 void dijkstra(int start) {
-	priority_queue<pii, vector<pii>, greater<pii> > que;
-	memset(h, INF, sizeof h);
-	h[start] = 0;
-	que.push(pii(0, start));
-	while (!que.empty()) {
-		pii p = que.top(); que.pop();
-		int u = p.second;
-		if (h[u] < p.first) continue;
-		for (int i = headrev[u]; ~i; i = edge[i].next) {
-			Edge e = edge[i];
-			if(h[e.to] > h[u] + e.cost) {
-				h[e.to] = h[u] + e.cost;
-				que.push(pii(h[e.to], e.to));
-			}
-		}
-	}
+    priority_queue<pii, vector<pii>, greater<pii> > que;
+    memset(h, INF, sizeof h);
+    h[start] = 0;
+    que.push(pii(0, start));
+    while (!que.empty()) {
+        pii p = que.top(); que.pop();
+        int u = p.second;
+        if (h[u] < p.first) continue;
+        for (int i = headrev[u]; ~i; i = edge[i].next) {
+            Edge e = edge[i];
+            if(h[e.to] > h[u] + e.cost) {
+                h[e.to] = h[u] + e.cost;
+                que.push(pii(h[e.to], e.to));
+            }
+        }
+    }
 }
 
 struct Status {
-	int now, g;
-	Status(int now, int g): now(now), g(g) {}
-	bool operator < (const Status &rhs) const {
-		return g + h[now] > rhs.g + h[rhs.now];
-	}
+    int now, g;
+    Status(int now, int g): now(now), g(g) {}
+    bool operator < (const Status &rhs) const {
+        return g + h[now] > rhs.g + h[rhs.now];
+    }
 };
 
 int Astar(int start, int endd, int k) {
-	if(h[start] == INF) {
-		return -1;
-	} else {
-		int cnt[NODE_NUM];
-		memset(cnt, 0, sizeof cnt);
-		priority_queue<Status> que;
-		que.push(Status(start, 0));
-		while(!que.empty()) {
-			Status sta = que.top();
-			que.pop();
-			int now = sta.now;
-			int g = sta.g;
-			cnt[now]++;
-			if(cnt[endd] == k) return g;
-			if(cnt[now] > k) continue;
-			for(int i = head[now]; ~i; i = edge[i].next) {
-				int to = edge[i].to;
-				int cost = edge[i].cost;
-				que.push(Status(to, g + cost));
-			}
-		}
-	}
-	return -1;
+    if(h[start] == INF) {
+        return -1;
+    } else {
+        int cnt[NODE_NUM];
+        memset(cnt, 0, sizeof cnt);
+        priority_queue<Status> que;
+        que.push(Status(start, 0));
+        while(!que.empty()) {
+            Status sta = que.top();
+            que.pop();
+            int now = sta.now;
+            int g = sta.g;
+            cnt[now]++;
+            if(cnt[endd] == k) return g;
+            if(cnt[now] > k) continue;
+            for(int i = head[now]; ~i; i = edge[i].next) {
+                int to = edge[i].to;
+                int cost = edge[i].cost;
+                que.push(Status(to, g + cost));
+            }
+        }
+    }
+    return -1;
 }
 
 int main(void) {
-	int nodeNum, edgeNum, u, v, cost, start, endd, k;
-	while(~scanf("%d%d", &nodeNum, &edgeNum)) {
-		init();
-		for(int i = 0; i < edgeNum; i++) {
-			// 表示u到v有一条权值为cost的有向边
-			scanf("%d%d%d", &u, &v, &cost);
-			addedge(u, v, cost);
-		}
-		scanf("%d%d%d", &start, &endd, &k);
-		dijkstra(endd);
-		if(start == endd) k++;
-		printf("%d\n", Astar(start, endd, k));
-	}
-	return 0;
+    int nodeNum, edgeNum, u, v, cost, start, endd, k;
+    while(~scanf("%d%d", &nodeNum, &edgeNum)) {
+        init();
+        for(int i = 0; i < edgeNum; i++) {
+            // 表示u到v有一条权值为cost的有向边
+            scanf("%d%d%d", &u, &v, &cost);
+            addedge(u, v, cost);
+        }
+        scanf("%d%d%d", &start, &endd, &k);
+        dijkstra(endd);
+        if(start == endd) k++;
+        printf("%d\n", Astar(start, endd, k));
+    }
+    return 0;
 }
 ```
 
@@ -3920,72 +3920,72 @@ const int INF = 0x3f3f3f3f;
 const int MAXN = 2010;//点数的最大值
 const int MAXM = 1200010;//边数的最大值
 struct Edge{
-	int to,next,cap,flow;
+    int to,next,cap,flow;
 }edge[MAXM];//注意是 MAXM
 int tol;
 int head[MAXN];
 void init(){
-	tol = 2;
-	memset(head, -1,sizeof(head));
+    tol = 2;
+    memset(head, -1,sizeof(head));
 }
 void addedge(int u,int v,int w,int rw = 0){
-	edge[tol].to = v; edge[tol].cap = w; edge[tol].flow = 0;
-	edge[tol].next = head[u]; head[u] = tol++;
-	edge[tol].to = u; edge[tol].cap = rw; edge[tol].flow = 0;
-	edge[tol].next = head[v]; head[v] = tol++;
+    edge[tol].to = v; edge[tol].cap = w; edge[tol].flow = 0;
+    edge[tol].next = head[u]; head[u] = tol++;
+    edge[tol].to = u; edge[tol].cap = rw; edge[tol].flow = 0;
+    edge[tol].next = head[v]; head[v] = tol++;
 }
 int Q[MAXN];
 int dep[MAXN],cur[MAXN],sta[MAXN];
 bool bfs(int s,int t,int n){
-	int front = 0,tail = 0;
-	memset(dep, -1,sizeof(dep[0])*(n+1));
-	dep[s] = 0;
-	Q[tail++] = s;
-	while(front < tail){
-		int u = Q[front++];
-		for(int i = head[u]; i != -1;i = edge[i].next){
-			int v = edge[i].to;
-			if(edge[i].cap > edge[i].flow && dep[v] == -1){
-				dep[v] = dep[u] + 1;
-				if(v == t)return true;
-				Q[tail++] = v;
-			}
-		}
-	}
-	return false;
+    int front = 0,tail = 0;
+    memset(dep, -1,sizeof(dep[0])*(n+1));
+    dep[s] = 0;
+    Q[tail++] = s;
+    while(front < tail){
+        int u = Q[front++];
+        for(int i = head[u]; i != -1;i = edge[i].next){
+            int v = edge[i].to;
+            if(edge[i].cap > edge[i].flow && dep[v] == -1){
+                dep[v] = dep[u] + 1;
+                if(v == t)return true;
+                Q[tail++] = v;
+            }
+        }
+    }
+    return false;
 }
 int dinic(int s,int t,int n){
-	int maxflow = 0;
-	while(bfs(s,t,n)){
-		for(int i = 0;i < n;i++)cur[i] = head[i];
-		int u = s, tail = 0;
-		while(cur[s] != -1){
-			if(u == t){
-				int tp = INF;
-				for(int i = tail -1;i >= 0; i--)
-					tp = min(tp,edge[sta[i]].cap - edge[sta[i]].flow);
-				maxflow += tp;
-				for(int i = tail -1;i >= 0; i--){
-					edge[sta[i]].flow += tp;
-					edge[sta[i]^1].flow -= tp;
-					if(edge[sta[i]].cap - edge[sta[i]].flow == 0)
-						tail = i;
-				}
-				u = edge[sta[tail]^1].to;
-			}
-			else if(cur[u] != -1 && edge[cur[u]].cap > edge[cur[u
-			]].flow && dep[u] + 1 == dep[edge[cur[u]].to]){
-				sta[tail++] = cur[u];
-				u = edge[cur[u]].to;
-			}
-			else {
-				while(u != s && cur[u] == -1)
-					u = edge[sta[ --tail]^1].to;
-				cur[u] = edge[cur[u]].next;
-			}
-		}
-	}
-	return maxflow;
+    int maxflow = 0;
+    while(bfs(s,t,n)){
+        for(int i = 0;i < n;i++)cur[i] = head[i];
+        int u = s, tail = 0;
+        while(cur[s] != -1){
+            if(u == t){
+                int tp = INF;
+                for(int i = tail -1;i >= 0; i--)
+                    tp = min(tp,edge[sta[i]].cap - edge[sta[i]].flow);
+                maxflow += tp;
+                for(int i = tail -1;i >= 0; i--){
+                    edge[sta[i]].flow += tp;
+                    edge[sta[i]^1].flow -= tp;
+                    if(edge[sta[i]].cap - edge[sta[i]].flow == 0)
+                        tail = i;
+                }
+                u = edge[sta[tail]^1].to;
+            }
+            else if(cur[u] != -1 && edge[cur[u]].cap > edge[cur[u
+            ]].flow && dep[u] + 1 == dep[edge[cur[u]].to]){
+                sta[tail++] = cur[u];
+                u = edge[cur[u]].to;
+            }
+            else {
+                while(u != s && cur[u] == -1)
+                    u = edge[sta[ --tail]^1].to;
+                cur[u] = edge[cur[u]].next;
+            }
+        }
+    }
+    return maxflow;
 }
 /************************************************************/
 ```
@@ -4004,43 +4004,43 @@ int nn;//点的个数，编号0-nn.nn包括了源点和汇点
 
 queue<int>q;
 int bfs() {
-	int i,t;
-	while(!q.empty()) q.pop();//把清空队列
-	memset(path, -1, sizeof path);//每次搜索前都把路径初始化成-1
-	path[start] = 0;
-	//memset(flow, 0, sizeof flow);//加上这一句，可在最终的残余网络求割边
-	flow[start] = INF;//源点可以有无穷的流流进
-	q.push(start);
-	while(!q.empty()) {
-		t = q.front();
-		q.pop();
-		if(t == en) break;
-		//枚举所有的点，如果点的编号起始点有变化可以改这里
-		for(i = 0;i <= nn; i++) {
-			if(i != start && path[i] == -1 && g[t][i]) {
-				flow[i] = min(flow[t], g[t][i]);
-				q.push(i);
-				path[i] = t;
-			}
-		}
-	}
-	if(path[en] == -1) return -1;//找不到增广路径了
-	return flow[en];
+    int i,t;
+    while(!q.empty()) q.pop();//把清空队列
+    memset(path, -1, sizeof path);//每次搜索前都把路径初始化成-1
+    path[start] = 0;
+    //memset(flow, 0, sizeof flow);//加上这一句，可在最终的残余网络求割边
+    flow[start] = INF;//源点可以有无穷的流流进
+    q.push(start);
+    while(!q.empty()) {
+        t = q.front();
+        q.pop();
+        if(t == en) break;
+        //枚举所有的点，如果点的编号起始点有变化可以改这里
+        for(i = 0;i <= nn; i++) {
+            if(i != start && path[i] == -1 && g[t][i]) {
+                flow[i] = min(flow[t], g[t][i]);
+                q.push(i);
+                path[i] = t;
+            }
+        }
+    }
+    if(path[en] == -1) return -1;//找不到增广路径了
+    return flow[en];
 }
 int max_flow() {
-	int max_flow = 0;
-	int step, now, pre;
-	while((step = bfs()) != -1) {
-		max_flow += step;
-		now = en;
-		while(now != start) {
-			pre = path[now];
-			g[pre][now] -= step;
-			g[now][pre] += step;
-			now = pre;
-		}
-	}
-	return max_flow;
+    int max_flow = 0;
+    int step, now, pre;
+    while((step = bfs()) != -1) {
+        max_flow += step;
+        now = en;
+        while(now != start) {
+            pre = path[now];
+            g[pre][now] -= step;
+            g[now][pre] += step;
+            now = pre;
+        }
+    }
+    return max_flow;
 }
 /************************************************************/
 ```
@@ -4056,95 +4056,95 @@ const int MAXN = 100010;//点数的最大值
 const int MAXM = 400010;//边数的最大值，注意反向边也要算进去，也就是说要乘以2
 const int INF = 0x3f3f3f3f;
 struct Edge{
-	int to,next,cap,flow;
+    int to,next,cap,flow;
 }edge[MAXM];//注意是 MAXM
 int tol;
 int head[MAXN];
 int gap[MAXN],dep[MAXN],cur[MAXN];
 void init(){
-	tol = 0;
-	memset(head,-1,sizeof(head));
+    tol = 0;
+    memset(head,-1,sizeof(head));
 }
 void addedge(int u,int v,int w,int rw = 0){
-	edge[tol].to = v; edge[tol].cap = w; edge[tol].flow = 0;
-	edge[tol].next = head[u]; head[u] = tol++;
-	edge[tol].to = u; edge[tol].cap = rw; edge[tol].flow = 0;
-	edge[tol].next = head[v]; head[v] = tol++;
+    edge[tol].to = v; edge[tol].cap = w; edge[tol].flow = 0;
+    edge[tol].next = head[u]; head[u] = tol++;
+    edge[tol].to = u; edge[tol].cap = rw; edge[tol].flow = 0;
+    edge[tol].next = head[v]; head[v] = tol++;
 }
 int Q[MAXN];
 void BFS(int start,int end){
-	memset(dep,-1,sizeof(dep));
-	memset(gap,0,sizeof(gap));
-	gap[0] = 1;
-	int front = 0, rear = 0;
-	dep[end] = 0;
-	Q[rear++] = end;
-	while(front != rear){
-		int u = Q[front++];
-		for(int i = head[u]; i != -1; i = edge[i].next){
-			int v = edge[i].to;
-			if(dep[v] != -1)continue;
-			Q[rear++] = v;
-			dep[v] = dep[u] + 1;
-			gap[dep[v]]++;
-		}
-	}
+    memset(dep,-1,sizeof(dep));
+    memset(gap,0,sizeof(gap));
+    gap[0] = 1;
+    int front = 0, rear = 0;
+    dep[end] = 0;
+    Q[rear++] = end;
+    while(front != rear){
+        int u = Q[front++];
+        for(int i = head[u]; i != -1; i = edge[i].next){
+            int v = edge[i].to;
+            if(dep[v] != -1)continue;
+            Q[rear++] = v;
+            dep[v] = dep[u] + 1;
+            gap[dep[v]]++;
+        }
+    }
 }
 int S[MAXN];
 // start起点，end为终点，nodeNum为顶点数，一般为en+1，注意en不为最后一个顶点的情况！
 int sap(int start,int end,int nodeNum) {
-	BFS(start,end);
-	memcpy(cur,head,sizeof(head));
-	int top = 0;
-	int u = start;
-	int ans = 0;
-	while(dep[start] < N){
-		if(u == end){
-			int Min = INF;
-			int inser;
-			for(int i = 0;i < top;i++)
-				if(Min > edge[S[i]].cap - edge[S[i]].flow){
-					Min = edge[S[i]].cap - edge[S[i]].flow;
-					inser = i;
-				}
-			for(int i = 0;i < top;i++){
-				edge[S[i]].flow += Min;
-				edge[S[i]^1].flow -= Min;
-			}
-			ans += Min;
-			top = inser;
-			u = edge[S[top]^1].to;
-			continue;
-		}
-		bool flag = false;
-		int v;
-		for(int i = cur[u]; i != -1; i = edge[i].next){
-			v = edge[i].to;
-			if(edge[i].cap - edge[i].flow && dep[v]+1 == dep[u]){
-				flag = true;
-				cur[u] = i;
-				break;
-			}
-		}
-		if(flag){
-			S[top++] = cur[u];
-			u = v;
-			continue;
-		}
-		int Min = N;
-		for(int i = head[u]; i != -1; i = edge[i].next)
-			if(edge[i].cap - edge[i].flow && dep[edge[i].to] < Min)
-			{
-				Min = dep[edge[i].to];
-				cur[u] = i;
-			}
-		gap[dep[u]]--;
-		if(!gap[dep[u]])return ans;
-		dep[u] = Min + 1;
-		gap[dep[u]]++;
-		if(u != start)u = edge[S[--top]^1].to;
-	}
-	return ans;
+    BFS(start,end);
+    memcpy(cur,head,sizeof(head));
+    int top = 0;
+    int u = start;
+    int ans = 0;
+    while(dep[start] < N){
+        if(u == end){
+            int Min = INF;
+            int inser;
+            for(int i = 0;i < top;i++)
+                if(Min > edge[S[i]].cap - edge[S[i]].flow){
+                    Min = edge[S[i]].cap - edge[S[i]].flow;
+                    inser = i;
+                }
+            for(int i = 0;i < top;i++){
+                edge[S[i]].flow += Min;
+                edge[S[i]^1].flow -= Min;
+            }
+            ans += Min;
+            top = inser;
+            u = edge[S[top]^1].to;
+            continue;
+        }
+        bool flag = false;
+        int v;
+        for(int i = cur[u]; i != -1; i = edge[i].next){
+            v = edge[i].to;
+            if(edge[i].cap - edge[i].flow && dep[v]+1 == dep[u]){
+                flag = true;
+                cur[u] = i;
+                break;
+            }
+        }
+        if(flag){
+            S[top++] = cur[u];
+            u = v;
+            continue;
+        }
+        int Min = N;
+        for(int i = head[u]; i != -1; i = edge[i].next)
+            if(edge[i].cap - edge[i].flow && dep[edge[i].to] < Min)
+            {
+                Min = dep[edge[i].to];
+                cur[u] = i;
+            }
+        gap[dep[u]]--;
+        if(!gap[dep[u]])return ans;
+        dep[u] = Min + 1;
+        gap[dep[u]]++;
+        if(u != start)u = edge[S[--top]^1].to;
+    }
+    return ans;
 }
 /************************************************************/
 ```
@@ -4165,49 +4165,49 @@ int dist[MAX_V];
 int prevv[MAX_V], preve[MAX_V];
 
 void add_edge(int from, int to, int cap, int cost){
-	G[from].push_back((edge){to, cap, cost, static_cast<int>(G[to].size())});
-	G[to].push_back((edge){from, 0, -cost, static_cast<int>(G[from].size()-1)});
+    G[from].push_back((edge){to, cap, cost, static_cast<int>(G[to].size())});
+    G[to].push_back((edge){from, 0, -cost, static_cast<int>(G[from].size()-1)});
 }
 
 int min_cost_flow(int s, int t, int f){
-	int res=0;
-	while(f>0){
-		fill(dist, dist+V, INF);
-		dist[s]=0;
-		bool update=true;
-		while(update){
-			update=false;
-			for(int v=0; v<V; v++){
-				if(dist[v]==INF) continue;
-				for(int i=0; i<G[v].size(); i++){
-					edge &e=G[v][i];
-					if(e.cap>0 && dist[e.to]>dist[v]+e.cost){
-						dist[e.to]=dist[v]+e.cost;
-						prevv[e.to]=v;
-						preve[e.to]=i;
-						update=true;
-					}
-				}
-			}
-		}
-	}
+    int res=0;
+    while(f>0){
+        fill(dist, dist+V, INF);
+        dist[s]=0;
+        bool update=true;
+        while(update){
+            update=false;
+            for(int v=0; v<V; v++){
+                if(dist[v]==INF) continue;
+                for(int i=0; i<G[v].size(); i++){
+                    edge &e=G[v][i];
+                    if(e.cap>0 && dist[e.to]>dist[v]+e.cost){
+                        dist[e.to]=dist[v]+e.cost;
+                        prevv[e.to]=v;
+                        preve[e.to]=i;
+                        update=true;
+                    }
+                }
+            }
+        }
+    }
 
-	if(dist[t]==INF){
-		return -1;
-	}
+    if(dist[t]==INF){
+        return -1;
+    }
 
-	int d=f;
-	for(int v=t; v!=s; v=prevv[v]){
-		d=min(d, G[prevv[v]][preve[v]].cap);
-	}
-	f-=d;
-	res+=d*dist[t];
-	for(int v=t; v!=s; v=prevv[v]){
-		edge &e=G[prevv[v]][preve[v]];
-		e.cap-=d;
-		G[v][e.rev].cap+=d;
-	}
-	return res;
+    int d=f;
+    for(int v=t; v!=s; v=prevv[v]){
+        d=min(d, G[prevv[v]][preve[v]].cap);
+    }
+    f-=d;
+    res+=d*dist[t];
+    for(int v=t; v!=s; v=prevv[v]){
+        edge &e=G[prevv[v]][preve[v]];
+        e.cap-=d;
+        G[v][e.rev].cap+=d;
+    }
+    return res;
 }
 
 /************************************************************************************/
@@ -4225,80 +4225,80 @@ const int MAXN = 10000;
 const int MAXM = 100000;
 const int INF = 0x3f3f3f3f;
 struct Edge{
-	int to,next,cap,flow,cost;
+    int to,next,cap,flow,cost;
 }edge[MAXM];
 int head[MAXN],tol;
 int pre[MAXN],dis[MAXN];
 bool vis[MAXN];
 int NN;//节点总个数,节点编号从 0 ∼ N-1
-void init(int n){	//en表示汇点, 一般是init(en + 1); 大一点也没关系
-	NN = n;
-	tol = 0;
-	memset(head, -1,sizeof(head));
+void init(int n){   //en表示汇点, 一般是init(en + 1); 大一点也没关系
+    NN = n;
+    tol = 0;
+    memset(head, -1,sizeof(head));
 }
 void addedge(int u,int v,int cap,int cost){
-	edge[tol].to = v;
-	edge[tol].cap = cap;
-	edge[tol].cost = cost;
-	edge[tol].flow = 0;
-	edge[tol].next = head[u];
-	head[u] = tol++;
-	edge[tol].to = u;
-	edge[tol].cap = 0;
-	edge[tol].cost = -cost;
-	edge[tol].flow = 0;
-	edge[tol].next = head[v];
-	head[v] = tol++;
+    edge[tol].to = v;
+    edge[tol].cap = cap;
+    edge[tol].cost = cost;
+    edge[tol].flow = 0;
+    edge[tol].next = head[u];
+    head[u] = tol++;
+    edge[tol].to = u;
+    edge[tol].cap = 0;
+    edge[tol].cost = -cost;
+    edge[tol].flow = 0;
+    edge[tol].next = head[v];
+    head[v] = tol++;
 }
 bool spfa(int s,int t){
-	queue<int>q;
-	for(int i = 0;i < NN;i++){
-		dis[i] = INF;
-		vis[i] = false;
-		pre[i] = -1;
-	}
-	dis[s] = 0;
-	vis[s] = true;
-	q.push(s);
-	while(!q.empty()){
-		int u = q.front();
-		q.pop();
-		vis[u] = false;
-		for(int i = head[u]; i != -1;i = edge[i].next){
-			int v = edge[i].to;
-			if(edge[i].cap > edge[i].flow && dis[v] > dis[u] + edge
-					[i].cost )
-			{
-				dis[v] = dis[u] + edge[i].cost;
-				pre[v] = i;
-				if(!vis[v]){
-					vis[v] = true;
-					q.push(v);
-				}
-			}
-		}
-	}
-	if(pre[t] == -1)return false;
-	else return true;
+    queue<int>q;
+    for(int i = 0;i < NN;i++){
+        dis[i] = INF;
+        vis[i] = false;
+        pre[i] = -1;
+    }
+    dis[s] = 0;
+    vis[s] = true;
+    q.push(s);
+    while(!q.empty()){
+        int u = q.front();
+        q.pop();
+        vis[u] = false;
+        for(int i = head[u]; i != -1;i = edge[i].next){
+            int v = edge[i].to;
+            if(edge[i].cap > edge[i].flow && dis[v] > dis[u] + edge
+                    [i].cost )
+            {
+                dis[v] = dis[u] + edge[i].cost;
+                pre[v] = i;
+                if(!vis[v]){
+                    vis[v] = true;
+                    q.push(v);
+                }
+            }
+        }
+    }
+    if(pre[t] == -1)return false;
+    else return true;
 }
 //返回的是最大流,cost 存的是最小费用
 int minCostMaxflow(int s,int t,int &cost){
-	int flow = 0;
-	cost = 0;
-	while(spfa(s,t)){
-		int Min = INF;
-		for(int i = pre[t];i != - 1;i = pre[edge[i^1].to]){
-			if(Min > edge[i].cap - edge[i].flow)
-				Min = edge[i].cap - edge[i].flow;
-		}
-		for(int i = pre[t];i != - 1;i = pre[edge[i^1].to]){
-			edge[i].flow += Min;
-			edge[i^1].flow -= Min;
-			cost += edge[i].cost * Min;
-		}
-		flow += Min;
-	}
-	return flow;
+    int flow = 0;
+    cost = 0;
+    while(spfa(s,t)){
+        int Min = INF;
+        for(int i = pre[t];i != - 1;i = pre[edge[i^1].to]){
+            if(Min > edge[i].cap - edge[i].flow)
+                Min = edge[i].cap - edge[i].flow;
+        }
+        for(int i = pre[t];i != - 1;i = pre[edge[i^1].to]){
+            edge[i].flow += Min;
+            edge[i^1].flow -= Min;
+            cost += edge[i].cost * Min;
+        }
+        flow += Min;
+    }
+    return flow;
 }
 /************************************************************/
 ```
@@ -4313,84 +4313,84 @@ const int MAXN = 1009;
 const int MAXM = 100009;
 const int INF = 0x3f3f3f3f;
 struct Edge{
-	int to,next,cap,flow,cost;
-	Edge(int _to = 0,int _next = 0,int _cap = 0,int _flow = 0,int
-			_cost = 0):
-		to(_to),next(_next),cap(_cap),flow(_flow),cost(_cost){}
+    int to,next,cap,flow,cost;
+    Edge(int _to = 0,int _next = 0,int _cap = 0,int _flow = 0,int
+            _cost = 0):
+        to(_to),next(_next),cap(_cap),flow(_flow),cost(_cost){}
 }edge[MAXM];
 struct ZKW_MinCostMaxFlow{
-	int head[MAXN],tot;
-	int cur[MAXN];
-	int dis[MAXN];
-	bool vis[MAXN];
-	int ss,tt,N;//源点、汇点和点的总个数(编号是 0 ∼ N-1), 不需要额外赋值, 调用会直接赋值
-	int min_cost, max_flow;
-	void init() {
-		tot = 0;
-		memset(head, -1,sizeof(head));
-	}
-	void addedge(int u,int v,int cap,int cost){
-		edge[tot] = Edge(v,head[u],cap,0,cost);
-		head[u] = tot++;
-		edge[tot] = Edge(u,head[v],0,0, -cost);
-		head[v] = tot++;
-	}
-	int aug(int u,int flow){
-		if(u == tt)return flow;
-		vis[u] = true;
-		for(int i = cur[u];i != -1;i = edge[i].next){
-			int v = edge[i].to;
-			if(edge[i].cap > edge[i].flow && !vis[v] && dis[u] ==
-					dis[v] + edge[i].cost){
-				int tmp = aug(v,min(flow,edge[i].cap -edge[i].flow))
-					;
-				edge[i].flow += tmp;
-				edge[i^1].flow -= tmp;
-				cur[u] = i;
-				if(tmp)return tmp;
-			}
-		}
-		return 0;
-	}
-	bool modify_label(){
-		int d = INF;
-		for(int u = 0;u < N;u++)
-			if(vis[u])
-				for(int i = head[u];i != -1;i = edge[i].next){
-					int v = edge[i].to;
-					if(edge[i].cap>edge[i].flow && !vis[v])
-						d = min(d,dis[v]+edge[i].cost - dis[u]);
-				}
-		if(d == INF)return false;
-		for(int i = 0;i < N;i++)
-			if(vis[i]){
-				vis[i] = false;
-				dis[i] += d;
-			}
-		return true;
-	}
-	/*
-	 * 直接调用获取最小费用和最大流
-	 * 输入: start-源点,end-汇点,n-点的总个数(编号从 0 开始)
-	 * 返回值: pair<int,int> 第一个是最小费用,第二个是最大流
-	 */
-	pair<int,int> mincostmaxflow(int start,int end,int n){
-		ss = start, tt = end, N = n;
-		min_cost = max_flow = 0;
-		for(int i = 0;i < n;i++)dis[i] = 0;
-		while(1){
-			for(int i = 0;i < n;i++)cur[i] = head[i];
-			while(1){
-				for(int i = 0;i < n;i++)vis[i] = false;
-				int tmp = aug(ss,INF);
-				if(tmp == 0)break;
-				max_flow += tmp;
-				min_cost += tmp*dis[ss];
-			}
-			if(!modify_label())break;
-		}
-		return make_pair(min_cost,max_flow);
-	}
+    int head[MAXN],tot;
+    int cur[MAXN];
+    int dis[MAXN];
+    bool vis[MAXN];
+    int ss,tt,N;//源点、汇点和点的总个数(编号是 0 ∼ N-1), 不需要额外赋值, 调用会直接赋值
+    int min_cost, max_flow;
+    void init() {
+        tot = 0;
+        memset(head, -1,sizeof(head));
+    }
+    void addedge(int u,int v,int cap,int cost){
+        edge[tot] = Edge(v,head[u],cap,0,cost);
+        head[u] = tot++;
+        edge[tot] = Edge(u,head[v],0,0, -cost);
+        head[v] = tot++;
+    }
+    int aug(int u,int flow){
+        if(u == tt)return flow;
+        vis[u] = true;
+        for(int i = cur[u];i != -1;i = edge[i].next){
+            int v = edge[i].to;
+            if(edge[i].cap > edge[i].flow && !vis[v] && dis[u] ==
+                    dis[v] + edge[i].cost){
+                int tmp = aug(v,min(flow,edge[i].cap -edge[i].flow))
+                    ;
+                edge[i].flow += tmp;
+                edge[i^1].flow -= tmp;
+                cur[u] = i;
+                if(tmp)return tmp;
+            }
+        }
+        return 0;
+    }
+    bool modify_label(){
+        int d = INF;
+        for(int u = 0;u < N;u++)
+            if(vis[u])
+                for(int i = head[u];i != -1;i = edge[i].next){
+                    int v = edge[i].to;
+                    if(edge[i].cap>edge[i].flow && !vis[v])
+                        d = min(d,dis[v]+edge[i].cost - dis[u]);
+                }
+        if(d == INF)return false;
+        for(int i = 0;i < N;i++)
+            if(vis[i]){
+                vis[i] = false;
+                dis[i] += d;
+            }
+        return true;
+    }
+    /*
+     * 直接调用获取最小费用和最大流
+     * 输入: start-源点,end-汇点,n-点的总个数(编号从 0 开始)
+     * 返回值: pair<int,int> 第一个是最小费用,第二个是最大流
+     */
+    pair<int,int> mincostmaxflow(int start,int end,int n){
+        ss = start, tt = end, N = n;
+        min_cost = max_flow = 0;
+        for(int i = 0;i < n;i++)dis[i] = 0;
+        while(1){
+            for(int i = 0;i < n;i++)cur[i] = head[i];
+            while(1){
+                for(int i = 0;i < n;i++)vis[i] = false;
+                int tmp = aug(ss,INF);
+                if(tmp == 0)break;
+                max_flow += tmp;
+                min_cost += tmp*dis[ss];
+            }
+            if(!modify_label())break;
+        }
+        return make_pair(min_cost,max_flow);
+    }
 }solve;
 /************************************************************/
 ```
